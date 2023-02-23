@@ -80,7 +80,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		height := ReturnHeight(chainCode)
 		WriteHeight(chainCode, height+1)
 		lastBlock := GetLastBlock(chainCode)
-		if height >= GetLastBlock(chainCode) {
+		if height > lastBlock {
+			WriteHeight(chainCode, GetLastBlock(chainCode))
 			height = lastBlock
 			time.Sleep(2 * time.Second)
 		}
