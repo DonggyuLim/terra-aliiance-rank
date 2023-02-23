@@ -29,19 +29,22 @@ const (
 
 func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
-
-	go MakeReward(ATREIDES)
-	go MakeReward(Harkonnen)
-	go MakeReward(CORRINO)
-	go MakeReward(ORDOS)
+	mwg := sync.WaitGroup{}
+	mwg.Add(5)
+	go MakeReward(wg, ATREIDES)
+	go MakeReward(wg, Harkonnen)
+	go MakeReward(wg, CORRINO)
+	go MakeReward(wg, ORDOS)
 	go MakeTotal(wg)
+	mwg.Wait()
 }
 
 func MakeTotal(wg *sync.WaitGroup) {
-	fmt.Println("Total!")
+	defer wg.Done()
 	for {
+		fmt.Println("Total!")
 		accountList, err := db.Find("", "", "total.total", 100000000)
-		if err != nil {
+		if err != nil || len(accountList) == 0 {
 			continue
 		}
 		for _, account := range accountList {
@@ -62,12 +65,10 @@ func MakeTotal(wg *sync.WaitGroup) {
 
 }
 
-func MakeReward(chainCode int) {
+func MakeReward(wg *sync.WaitGroup, chainCode int) {
+	defer wg.Done()
 	height := 10
 	for {
-
-		// height := ReturnHeight(chainCode)
-		// WriteHeight(chainCode, height+1)
 		lastBlock := GetLastBlock(chainCode)
 		if height >= GetLastBlock(chainCode) {
 			height = lastBlock
@@ -297,7 +298,6 @@ func MakeReward(chainCode int) {
 							db.UpdateOne(filter, update)
 						}
 					}
-
 				default:
 					fmt.Println("New Account!")
 					a.SetAccount(delegation.DelegatorAddress, delegation.ValidatorAddress, reward, chainCode)
