@@ -91,9 +91,9 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 		w := &sync.WaitGroup{}
 		w.Add(len(delegations))
-		fmt.Println("w Count:", w)
+		fmt.Println("w :", w)
 		fmt.Println("delegation loop start!")
-		for i := 0; i < len(delegations); i++ {
+		for i := 0; i <= len(delegations)-1; i++ {
 			delegation := delegations[i].Delegation
 			fmt.Println("delegation : ", delegation)
 			go func() {
@@ -106,6 +106,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					delegation.Denom,
 				)
 				if err != nil || len(resReward) == 0 {
+					fmt.Println("Not Reward!")
 					return
 				}
 				reward := account.Reward{
