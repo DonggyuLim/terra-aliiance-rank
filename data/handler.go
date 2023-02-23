@@ -58,7 +58,7 @@ func GetAddress(chainCode int, address string) string {
 func GetDelegations(height, chainCode int) (request.DelegationRequest, error) {
 
 	value := fmt.Sprintf("%v", height)
-	fmt.Println(value)
+
 	client := req.R().
 		SetHeader("x-cosmos-block-height", value).SetHeader("Content-Type", "application/json")
 	endpoint := fmt.Sprintf("%s/terra/alliances/delegations",
@@ -111,8 +111,10 @@ func ReturnHeight(chainCode int) int {
 }
 
 func WriteHeight(chainCode, height int) {
+	fmt.Println(height)
 	switch chainCode {
 	case 0:
+
 		utils.WriteENV("HEIGHT", strconv.Itoa(height), "atr.env")
 	case 1:
 		utils.WriteENV("HEIGHT", strconv.Itoa(height), "har.env")
