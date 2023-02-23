@@ -173,13 +173,9 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 											{Key: "sord", Value: claimSORD},
 										},
 										},
-										{
-											Key: "$set", Value: bson.D{
-												{Key: "atreides.reward", Value: bson.D{
-													{Key: delegation.ValidatorAddress, Value: reward},
-												},
-												},
-											},
+										{Key: "atreides.reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										},
 										},
 									},
 								},
@@ -218,13 +214,9 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 											{Key: "sord", Value: claimSORD},
 										},
 										},
-										{
-											Key: "$set", Value: bson.D{
-												{Key: "harkonnen.reward", Value: bson.D{
-													{Key: delegation.ValidatorAddress, Value: reward},
-												},
-												},
-											},
+										{Key: "harkonnen.reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										},
 										},
 									},
 								},
@@ -263,13 +255,9 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 											{Key: "sord", Value: claimSORD},
 										},
 										},
-										{
-											Key: "$set", Value: bson.D{
-												{Key: "corrino.reward", Value: bson.D{
-													{Key: delegation.ValidatorAddress, Value: reward},
-												},
-												},
-											},
+										{Key: "corrino.reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										},
 										},
 									},
 								},
@@ -306,17 +294,14 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 											{Key: "sord", Value: claimSORD},
 										},
 										},
-										{
-											Key: "$set", Value: bson.D{
-												{Key: "ordos.reward", Value: bson.D{
-													{Key: delegation.ValidatorAddress, Value: reward},
-												},
-												},
-											},
+										{Key: "ordos.reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										},
 										},
 									},
 								},
 							}
+
 							db.UpdateOne(filter, claimUpdate)
 						} else {
 							fmt.Println("Update Reward!")
