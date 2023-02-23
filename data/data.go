@@ -29,20 +29,19 @@ const (
 
 func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
-	height, _ := strconv.Atoi(utils.LoadENV("HEIGHT", "height.env"))
-	for {
-		MakeReward(height, ATREIDES)
-		MakeReward(height, Harkonnen)
-		MakeReward(height, CORRINO)
-		MakeReward(height, ORDOS)
-		go MakeTotal(wg)
-		height += 1
-		utils.WriteENV("HEIGHT", strconv.Itoa(height), "height.env")
-	}
+	w := &sync.WaitGroup{}
+	w.Add(5)
+	go MakeReward(w, ATREIDES)
+	go MakeReward(w, Harkonnen)
+	go MakeReward(w, CORRINO)
+	go MakeReward(w, ORDOS)
+	go MakeTotal(w)
+	wg.Wait()
 }
 
 func MakeTotal(wg *sync.WaitGroup) {
 	defer wg.Done()
+
 	for {
 		time.Sleep(time.Second * 300)
 		fmt.Println("Total!")
@@ -69,245 +68,250 @@ func MakeTotal(wg *sync.WaitGroup) {
 
 }
 
-func MakeReward(height, chainCode int) {
+func MakeReward(wg *sync.WaitGroup, chainCode int) {
+	defer wg.Done()
+	height := 1000
+	for {
+		lastBlock := GetLastBlock(chainCode)
+		if height >= GetLastBlock(chainCode) {
+			height = lastBlock
+			time.Sleep(2 * time.Second)
+		}
 
-	lastBlock := GetLastBlock(chainCode)
-	if height >= GetLastBlock(chainCode) {
-		height = lastBlock
-		time.Sleep(2 * time.Second)
-	}
+		delegationsData, err := GetDelegations(height, chainCode)
+		delegations := delegationsData.Deligations
+		if len(delegations) == 0 || err != nil {
+			fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
+			height += 1
+			continue
+		}
 
-	delegationsData, err := GetDelegations(height, chainCode)
-	delegations := delegationsData.Deligations
-	if len(delegations) == 0 || err != nil {
-		fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
+		fmt.Printf("chain: %v  height: %v delecount: %v  lastblock:%v \n", chainCode, height, len(delegations), lastBlock)
+		w := sync.WaitGroup{}
+		w.Add(len(delegations))
+		for i := 0; i < len(delegations); i++ {
+			delegation := delegations[i].Delegation
+
+			go func() {
+				resReward, err := GetRewards(
+					chainCode,
+					height,
+					delegation.DelegatorAddress,
+					delegation.ValidatorAddress,
+					delegation.Denom,
+				)
+				if err != nil || len(resReward) == 0 {
+					return
+				}
+				reward := account.Reward{
+					LastHeight: uint(height),
+					UAtr:       0,
+					UHar:       0,
+					UCor:       0,
+					UOrd:       0,
+					SCOR:       0,
+					SORD:       0,
+				}
+				for _, re := range resReward {
+					switch re.Denom {
+					case sCOR:
+						amount, err := strconv.Atoi(re.Amount)
+						utils.PanicError(err)
+						reward.SCOR = uint(amount)
+					case sORD:
+						amount, err := strconv.Atoi(re.Amount)
+						utils.PanicError(err)
+						reward.SORD = uint(amount)
+					case uatr:
+						amount, err := strconv.Atoi(re.Amount)
+						utils.PanicError(err)
+						reward.UAtr = uint(amount)
+					case uhar:
+						amount, err := strconv.Atoi(re.Amount)
+						utils.PanicError(err)
+						reward.UHar = uint(amount)
+					case ucor:
+						amount, err := strconv.Atoi(re.Amount)
+						utils.PanicError(err)
+						reward.UCor = uint(amount)
+					case uord:
+						amount, err := strconv.Atoi(re.Amount)
+						utils.PanicError(err)
+						reward.UOrd = uint(amount)
+					}
+				}
+				filter := bson.D{{Key: "address", Value: delegation.DelegatorAddress}}
+				a, ok := db.FindOne(filter)
+				switch ok {
+				case nil:
+					switch chainCode {
+					case 0:
+						o := a.Atreides.Rewards[delegation.ValidatorAddress]
+						if o.UAtr > reward.UAtr {
+							claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
+							claimSCOR := (o.SCOR - reward.SCOR) + a.Atreides.Claim.SCOR
+							claimSORD := (o.SORD - reward.SORD) + a.Atreides.Claim.SORD
+							claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "atreides", Value: bson.M{
+								"uatr": claimAtr,
+								"scor": claimSCOR,
+								"sord": claimSORD,
+							}}}}}
+							db.UpdateOne(filter, claimUpdate)
+							update := bson.D{{
+								Key: "$set", Value: bson.D{
+									{Key: "atreides", Value: bson.D{
+										{Key: "reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										}},
+									},
+									},
+								},
+							},
+							}
+							db.UpdateOne(filter, update)
+						} else {
+							update := bson.D{{
+								Key: "$set", Value: bson.D{
+									{Key: "atreides", Value: bson.D{
+										{Key: "reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										}},
+									},
+									},
+								},
+							},
+							}
+							db.UpdateOne(filter, update)
+						}
+
+					case 1:
+						o := a.Harkonnen.Rewards[delegation.ValidatorAddress]
+						if o.UHar > reward.UHar {
+							claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
+							claimSCOR := (o.SCOR - reward.SCOR) + a.Harkonnen.Claim.SCOR
+							claimSORD := (o.SORD - reward.SORD) + a.Harkonnen.Claim.SORD
+							claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "harkonnen", Value: bson.M{
+								"uHar": claimhar,
+								"scor": claimSCOR,
+								"sord": claimSORD,
+							}}}}}
+							db.UpdateOne(filter, claimUpdate)
+							update := bson.D{{
+								Key: "$set", Value: bson.D{
+									{Key: "harkonnen", Value: bson.D{
+										{Key: "reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										}},
+									},
+									},
+								},
+							},
+							}
+							db.UpdateOne(filter, update)
+						} else {
+							update := bson.D{{
+								Key: "$set", Value: bson.D{
+									{Key: "harkonnen", Value: bson.D{
+										{Key: "reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										}},
+									},
+									},
+								},
+							},
+							}
+							db.UpdateOne(filter, update)
+						}
+
+					case 2:
+						o := a.Corrino.Rewards[delegation.ValidatorAddress]
+						if o.UCor > reward.UCor {
+							claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
+							claimSCOR := (o.SCOR - reward.SCOR) + a.Corrino.Claim.SCOR
+							claimSORD := (o.SORD - reward.SORD) + a.Corrino.Claim.SORD
+							claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "corrino", Value: bson.M{
+								"ucor": claimCor,
+								"scor": claimSCOR,
+								"sord": claimSORD,
+							}}}}}
+							db.UpdateOne(filter, claimUpdate)
+							update := bson.D{{
+								Key: "$set", Value: bson.D{
+									{Key: "corrino", Value: bson.D{
+										{Key: "reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										}},
+									},
+									},
+								},
+							},
+							}
+							db.UpdateOne(filter, update)
+						} else {
+							update := bson.D{{
+								Key: "$set", Value: bson.D{
+									{Key: "corrino", Value: bson.D{
+										{Key: "reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										}},
+									},
+									},
+								},
+							},
+							}
+							db.UpdateOne(filter, update)
+						}
+					case 3:
+						o := a.Ordos.Rewards[delegation.ValidatorAddress]
+						if o.UOrd > reward.UOrd {
+							claimCor := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
+							claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
+							claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
+							claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "ordos", Value: bson.M{
+								"uord": claimCor,
+								"scor": claimSCOR,
+								"sord": claimSORD,
+							}}}}}
+							db.UpdateOne(filter, claimUpdate)
+
+							update := bson.D{{
+								Key: "$set", Value: bson.D{
+									{Key: "ordos", Value: bson.D{
+										{Key: "reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										}},
+									},
+									},
+								},
+							},
+							}
+							db.UpdateOne(filter, update)
+						} else {
+							update := bson.D{{
+								Key: "$set", Value: bson.D{
+									{Key: "ordos", Value: bson.D{
+										{Key: "reward", Value: bson.D{
+											{Key: delegation.ValidatorAddress, Value: reward},
+										}},
+									},
+									},
+								},
+							},
+							}
+							db.UpdateOne(filter, update)
+						}
+					}
+				default:
+					fmt.Println("New Account!")
+					a.SetAccount(delegation.DelegatorAddress, delegation.ValidatorAddress, reward, chainCode)
+					db.Insert(a)
+				}
+				w.Done()
+			}()
+
+			w.Wait()
+		}
 		height += 1
-		return
-	}
-
-	fmt.Printf("chain: %v  height: %v delecount: %v  lastblock:%v \n", chainCode, height, len(delegations), lastBlock)
-	wg := sync.WaitGroup{}
-	wg.Add(len(delegations))
-	for i := 0; i < len(delegations); i++ {
-		delegation := delegations[i].Delegation
-
-		go func() {
-			resReward, err := GetRewards(
-				chainCode,
-				height,
-				delegation.DelegatorAddress,
-				delegation.ValidatorAddress,
-				delegation.Denom,
-			)
-			if err != nil || len(resReward) == 0 {
-				return
-			}
-			reward := account.Reward{
-				LastHeight: uint(height),
-				UAtr:       0,
-				UHar:       0,
-				UCor:       0,
-				UOrd:       0,
-				SCOR:       0,
-				SORD:       0,
-			}
-			for _, re := range resReward {
-				switch re.Denom {
-				case sCOR:
-					amount, err := strconv.Atoi(re.Amount)
-					utils.PanicError(err)
-					reward.SCOR = uint(amount)
-				case sORD:
-					amount, err := strconv.Atoi(re.Amount)
-					utils.PanicError(err)
-					reward.SORD = uint(amount)
-				case uatr:
-					amount, err := strconv.Atoi(re.Amount)
-					utils.PanicError(err)
-					reward.UAtr = uint(amount)
-				case uhar:
-					amount, err := strconv.Atoi(re.Amount)
-					utils.PanicError(err)
-					reward.UHar = uint(amount)
-				case ucor:
-					amount, err := strconv.Atoi(re.Amount)
-					utils.PanicError(err)
-					reward.UCor = uint(amount)
-				case uord:
-					amount, err := strconv.Atoi(re.Amount)
-					utils.PanicError(err)
-					reward.UOrd = uint(amount)
-				}
-			}
-			filter := bson.D{{Key: "address", Value: delegation.DelegatorAddress}}
-			a, ok := db.FindOne(filter)
-			switch ok {
-			case nil:
-				switch chainCode {
-				case 0:
-					o := a.Atreides.Rewards[delegation.ValidatorAddress]
-					if o.UAtr > reward.UAtr {
-						claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
-						claimSCOR := (o.SCOR - reward.SCOR) + a.Atreides.Claim.SCOR
-						claimSORD := (o.SORD - reward.SORD) + a.Atreides.Claim.SORD
-						claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "atreides", Value: bson.M{
-							"uatr": claimAtr,
-							"scor": claimSCOR,
-							"sord": claimSORD,
-						}}}}}
-						db.UpdateOne(filter, claimUpdate)
-						update := bson.D{{
-							Key: "$set", Value: bson.D{
-								{Key: "atreides", Value: bson.D{
-									{Key: "reward", Value: bson.D{
-										{Key: delegation.ValidatorAddress, Value: reward},
-									}},
-								},
-								},
-							},
-						},
-						}
-						db.UpdateOne(filter, update)
-					} else {
-						update := bson.D{{
-							Key: "$set", Value: bson.D{
-								{Key: "atreides", Value: bson.D{
-									{Key: "reward", Value: bson.D{
-										{Key: delegation.ValidatorAddress, Value: reward},
-									}},
-								},
-								},
-							},
-						},
-						}
-						db.UpdateOne(filter, update)
-					}
-
-				case 1:
-					o := a.Harkonnen.Rewards[delegation.ValidatorAddress]
-					if o.UHar > reward.UHar {
-						claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
-						claimSCOR := (o.SCOR - reward.SCOR) + a.Harkonnen.Claim.SCOR
-						claimSORD := (o.SORD - reward.SORD) + a.Harkonnen.Claim.SORD
-						claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "harkonnen", Value: bson.M{
-							"uHar": claimhar,
-							"scor": claimSCOR,
-							"sord": claimSORD,
-						}}}}}
-						db.UpdateOne(filter, claimUpdate)
-						update := bson.D{{
-							Key: "$set", Value: bson.D{
-								{Key: "harkonnen", Value: bson.D{
-									{Key: "reward", Value: bson.D{
-										{Key: delegation.ValidatorAddress, Value: reward},
-									}},
-								},
-								},
-							},
-						},
-						}
-						db.UpdateOne(filter, update)
-					} else {
-						update := bson.D{{
-							Key: "$set", Value: bson.D{
-								{Key: "harkonnen", Value: bson.D{
-									{Key: "reward", Value: bson.D{
-										{Key: delegation.ValidatorAddress, Value: reward},
-									}},
-								},
-								},
-							},
-						},
-						}
-						db.UpdateOne(filter, update)
-					}
-
-				case 2:
-					o := a.Corrino.Rewards[delegation.ValidatorAddress]
-					if o.UCor > reward.UCor {
-						claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
-						claimSCOR := (o.SCOR - reward.SCOR) + a.Corrino.Claim.SCOR
-						claimSORD := (o.SORD - reward.SORD) + a.Corrino.Claim.SORD
-						claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "corrino", Value: bson.M{
-							"ucor": claimCor,
-							"scor": claimSCOR,
-							"sord": claimSORD,
-						}}}}}
-						db.UpdateOne(filter, claimUpdate)
-						update := bson.D{{
-							Key: "$set", Value: bson.D{
-								{Key: "corrino", Value: bson.D{
-									{Key: "reward", Value: bson.D{
-										{Key: delegation.ValidatorAddress, Value: reward},
-									}},
-								},
-								},
-							},
-						},
-						}
-						db.UpdateOne(filter, update)
-					} else {
-						update := bson.D{{
-							Key: "$set", Value: bson.D{
-								{Key: "corrino", Value: bson.D{
-									{Key: "reward", Value: bson.D{
-										{Key: delegation.ValidatorAddress, Value: reward},
-									}},
-								},
-								},
-							},
-						},
-						}
-						db.UpdateOne(filter, update)
-					}
-				case 3:
-					o := a.Ordos.Rewards[delegation.ValidatorAddress]
-					if o.UOrd > reward.UOrd {
-						claimCor := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
-						claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
-						claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
-						claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "ordos", Value: bson.M{
-							"uord": claimCor,
-							"scor": claimSCOR,
-							"sord": claimSORD,
-						}}}}}
-						db.UpdateOne(filter, claimUpdate)
-
-						update := bson.D{{
-							Key: "$set", Value: bson.D{
-								{Key: "ordos", Value: bson.D{
-									{Key: "reward", Value: bson.D{
-										{Key: delegation.ValidatorAddress, Value: reward},
-									}},
-								},
-								},
-							},
-						},
-						}
-						db.UpdateOne(filter, update)
-					} else {
-						update := bson.D{{
-							Key: "$set", Value: bson.D{
-								{Key: "ordos", Value: bson.D{
-									{Key: "reward", Value: bson.D{
-										{Key: delegation.ValidatorAddress, Value: reward},
-									}},
-								},
-								},
-							},
-						},
-						}
-						db.UpdateOne(filter, update)
-					}
-				}
-			default:
-				fmt.Println("New Account!")
-				a.SetAccount(delegation.DelegatorAddress, delegation.ValidatorAddress, reward, chainCode)
-				db.Insert(a)
-			}
-			wg.Done()
-		}()
-		wg.Wait()
 	}
 
 }
