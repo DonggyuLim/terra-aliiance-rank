@@ -152,7 +152,7 @@ func UpdateOne(filter, update bson.D) {
 	collection := db.Database(dbName).Collection(collectionName)
 	_, err := collection.UpdateOne(ctx, filter, update)
 	// utils.PanicError(err)
-	log.Fatal(err)
+	fmt.Println(err.Error())
 	// fmt.Println("Update End!")
 }
 
