@@ -159,36 +159,40 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Atreides.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Atreides.Claim.SORD
-							claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "atreides", Value: bson.M{
-								"uatr": claimAtr,
-								"scor": claimSCOR,
-								"sord": claimSORD,
-							}}}}}
-							db.UpdateOne(filter, claimUpdate)
-							update := bson.D{{
-								Key: "$set", Value: bson.D{
-									{Key: "atreides", Value: bson.D{
-										{Key: "reward", Value: bson.D{
-											{Key: delegation.ValidatorAddress, Value: reward},
-										}},
-									},
+							claimUpdate := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "atreides.claim", Value: bson.D{
+											{Key: "uatr", Value: claimAtr},
+											{Key: "scor", Value: claimSCOR},
+											{Key: "sord", Value: claimSORD},
+										},
+										},
+										{
+											Key: "$set", Value: bson.D{
+												{Key: "atreides.reward", Value: bson.D{
+													{Key: delegation.ValidatorAddress, Value: reward},
+												},
+												},
+											},
+										},
 									},
 								},
-							},
 							}
-							db.UpdateOne(filter, update)
+
+							db.UpdateOne(filter, claimUpdate)
+
 						} else {
 							fmt.Println("Update Reward!")
-							update := bson.D{{
-								Key: "$set", Value: bson.D{
-									{Key: "atreides", Value: bson.D{
-										{Key: "reward", Value: bson.D{
+							update := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "atreides.reward", Value: bson.D{
 											{Key: delegation.ValidatorAddress, Value: reward},
-										}},
-									},
+										},
+										},
 									},
 								},
-							},
 							}
 							db.UpdateOne(filter, update)
 						}
@@ -200,37 +204,40 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Harkonnen.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Harkonnen.Claim.SORD
-							claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "harkonnen", Value: bson.M{
-								"uHar": claimhar,
-								"scor": claimSCOR,
-								"sord": claimSORD,
-							}}}}}
-							db.UpdateOne(filter, claimUpdate)
-							update := bson.D{{
-								Key: "$set", Value: bson.D{
-									{Key: "harkonnen", Value: bson.D{
-										{Key: "reward", Value: bson.D{
-											{Key: delegation.ValidatorAddress, Value: reward},
-										}},
-									},
+							claimUpdate := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "harkonnen.claim", Value: bson.D{
+											{Key: "uhar", Value: claimhar},
+											{Key: "scor", Value: claimSCOR},
+											{Key: "sord", Value: claimSORD},
+										},
+										},
+										{
+											Key: "$set", Value: bson.D{
+												{Key: "harkonnen.reward", Value: bson.D{
+													{Key: delegation.ValidatorAddress, Value: reward},
+												},
+												},
+											},
+										},
 									},
 								},
-							},
 							}
-							db.UpdateOne(filter, update)
+							db.UpdateOne(filter, claimUpdate)
 						} else {
 							fmt.Println("Update Reward!")
-							update := bson.D{{
-								Key: "$set", Value: bson.D{
-									{Key: "harkonnen", Value: bson.D{
-										{Key: "reward", Value: bson.D{
+							update := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "harkonnen.reward", Value: bson.D{
 											{Key: delegation.ValidatorAddress, Value: reward},
-										}},
-									},
+										},
+										},
 									},
 								},
-							},
 							}
+
 							db.UpdateOne(filter, update)
 						}
 
@@ -242,78 +249,83 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Corrino.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Corrino.Claim.SORD
-							claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "corrino", Value: bson.M{
-								"ucor": claimCor,
-								"scor": claimSCOR,
-								"sord": claimSORD,
-							}}}}}
-							db.UpdateOne(filter, claimUpdate)
-							update := bson.D{{
-								Key: "$set", Value: bson.D{
-									{Key: "corrino", Value: bson.D{
-										{Key: "reward", Value: bson.D{
-											{Key: delegation.ValidatorAddress, Value: reward},
-										}},
-									},
+							claimUpdate := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "corrino.claim", Value: bson.D{
+											{Key: "ucor", Value: claimCor},
+											{Key: "scor", Value: claimSCOR},
+											{Key: "sord", Value: claimSORD},
+										},
+										},
+										{
+											Key: "$set", Value: bson.D{
+												{Key: "corrino.reward", Value: bson.D{
+													{Key: delegation.ValidatorAddress, Value: reward},
+												},
+												},
+											},
+										},
 									},
 								},
-							},
 							}
-							db.UpdateOne(filter, update)
+							db.UpdateOne(filter, claimUpdate)
 						} else {
 							fmt.Println("Update Reward!")
-							update := bson.D{{
-								Key: "$set", Value: bson.D{
-									{Key: "corrino", Value: bson.D{
-										{Key: "reward", Value: bson.D{
+							update := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "corrino.reward", Value: bson.D{
 											{Key: delegation.ValidatorAddress, Value: reward},
-										}},
-									},
+										},
+										},
 									},
 								},
-							},
 							}
+
 							db.UpdateOne(filter, update)
 						}
 					case 3:
 						o := a.Ordos.Rewards[delegation.ValidatorAddress]
 						if o.UOrd > reward.UOrd {
 							fmt.Println("Claim")
-							claimCor := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
+							claimOrd := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
-							claimUpdate := bson.D{{Key: "$set", Value: bson.D{{Key: "ordos", Value: bson.M{
-								"uord": claimCor,
-								"scor": claimSCOR,
-								"sord": claimSORD,
-							}}}}}
-							db.UpdateOne(filter, claimUpdate)
-
-							update := bson.D{{
-								Key: "$set", Value: bson.D{
-									{Key: "ordos", Value: bson.D{
-										{Key: "reward", Value: bson.D{
-											{Key: delegation.ValidatorAddress, Value: reward},
-										}},
-									},
+							claimUpdate := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "ordos.claim", Value: bson.D{
+											{Key: "uord", Value: claimOrd},
+											{Key: "scor", Value: claimSCOR},
+											{Key: "sord", Value: claimSORD},
+										},
+										},
+										{
+											Key: "$set", Value: bson.D{
+												{Key: "ordos.reward", Value: bson.D{
+													{Key: delegation.ValidatorAddress, Value: reward},
+												},
+												},
+											},
+										},
 									},
 								},
-							},
 							}
-							db.UpdateOne(filter, update)
+							db.UpdateOne(filter, claimUpdate)
 						} else {
 							fmt.Println("Update Reward!")
-							update := bson.D{{
-								Key: "$set", Value: bson.D{
-									{Key: "ordos", Value: bson.D{
-										{Key: "reward", Value: bson.D{
+							update := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "ordos.reward", Value: bson.D{
 											{Key: delegation.ValidatorAddress, Value: reward},
-										}},
-									},
+										},
+										},
 									},
 								},
-							},
 							}
+
 							db.UpdateOne(filter, update)
 						}
 					}
