@@ -66,7 +66,7 @@ func MakeReward(chainCode int) {
 	height := ReturnHeight(chainCode)
 
 	for height <= GetLastBlock(chainCode) {
-
+		WriteHeight(chainCode, height+1)
 		if height > GetLastBlock(chainCode) {
 			height = GetLastBlock(chainCode)
 		}
@@ -75,11 +75,11 @@ func MakeReward(chainCode int) {
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
 			fmt.Printf("chain : %v height: %v Not Delegate\n", chainCode, height)
-			WriteHeight(chainCode, height+1)
+
 			continue
 		}
 
-		fmt.Printf("chain:%v  height:%v count:%v\n", chainCode, height, len(delegations))
+		fmt.Printf("chain:%v  height:%v count:%v \n", chainCode, height, len(delegations))
 		for i := 0; i < len(delegations); i++ {
 			delegation := delegations[i].Delegation
 
@@ -301,7 +301,7 @@ func MakeReward(chainCode int) {
 
 			}()
 		}
-		WriteHeight(chainCode, height+1)
+
 	}
 }
 
