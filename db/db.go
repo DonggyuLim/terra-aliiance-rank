@@ -152,8 +152,11 @@ func FindAll() ([]account.Account, error) {
 
 	filter := bson.D{}
 
-	cur, _ := collection.Find(ctx, filter, findOptions)
+	cur, err := collection.Find(ctx, filter, findOptions)
 	var curs []account.Account
+	if err != nil {
+		return curs, err
+	}
 	err := cur.All(context.TODO(), &curs)
 	return curs, err
 }
