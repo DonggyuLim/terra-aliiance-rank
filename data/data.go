@@ -75,11 +75,10 @@ func MakeTotal(wg *sync.WaitGroup) {
 
 func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	defer wg.Done()
+	height := ReturnHeight(chainCode)
 
 	for {
-		height := ReturnHeight(chainCode)
-		nextheight := height + 1
-		WriteHeight(chainCode, nextheight)
+
 		lastBlock := GetLastBlock(chainCode)
 		if height > lastBlock {
 			WriteHeight(chainCode, GetLastBlock(chainCode))
@@ -348,6 +347,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			log.Panicln(err.Error())
 		}
 		height += 1
+		WriteHeight(chainCode, height)
 	}
 
 }
