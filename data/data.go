@@ -31,10 +31,10 @@ func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
 	w := &sync.WaitGroup{}
 	w.Add(5)
-	go MakeReward(w, ATREIDES)
-	go MakeReward(w, Harkonnen)
+	// go MakeReward(w, ATREIDES)
+	// go MakeReward(w, Harkonnen)
 	go MakeReward(w, CORRINO)
-	go MakeReward(w, ORDOS)
+	// go MakeReward(w, ORDOS)
 	go MakeTotal(w)
 	wg.Wait()
 }
@@ -71,7 +71,7 @@ func MakeTotal(wg *sync.WaitGroup) {
 
 func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	defer wg.Done()
-	height := 1000
+	height := 100961
 	for {
 		lastBlock := GetLastBlock(chainCode)
 		if height >= GetLastBlock(chainCode) {
@@ -147,7 +147,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				a, ok := db.FindOne(filter)
 				switch ok {
 				case nil:
-					fmt.Println("Update!!!!!!!!!!!!!!")
+					fmt.Println("Exsits!!!")
 					switch chainCode {
 					case 0:
 						o := a.Atreides.Rewards[delegation.ValidatorAddress]

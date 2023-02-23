@@ -151,7 +151,8 @@ func UpdateOne(filter, update bson.D) {
 	defer cancel()
 	collection := db.Database(dbName).Collection(collectionName)
 	_, err := collection.UpdateOne(ctx, filter, update)
-	utils.PanicError(err)
+	// utils.PanicError(err)
+	log.Fatal(err)
 	// fmt.Println("Update End!")
 }
 
