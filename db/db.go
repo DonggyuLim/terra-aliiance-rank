@@ -87,7 +87,7 @@ func FindOne(filter bson.D) (account.Account, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
 	collection := db.Database(dbName).Collection(collectionName)
-	err := collection.FindOne(ctx, filter).Decode(a)
+	err := collection.FindOne(ctx, filter).Decode(&a)
 
 	if err != nil {
 		// ErrNoDocuments means that the filter did not match any documents in the collection
