@@ -66,10 +66,11 @@ func MakeReward(chainCode int) {
 
 	for height <= GetLastBlock(chainCode) {
 		WriteHeight(chainCode, height+1)
-		if height > GetLastBlock(chainCode) {
-			height = GetLastBlock(chainCode)
+		lastBlock := GetLastBlock(chainCode)
+		if height >= GetLastBlock(chainCode) {
+			height = lastBlock
 		}
-
+		fmt.Println("chain Last block : ", lastBlock)
 		delegationsData, err := GetDelegations(height, chainCode)
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {

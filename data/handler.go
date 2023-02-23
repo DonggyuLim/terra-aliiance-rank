@@ -12,7 +12,6 @@ import (
 func GetEndopoint(a int) string {
 	switch a {
 	case 0:
-		// return "https://atreides.terra.dev:1317"
 		return "http://localhost:1317"
 	case 1:
 		return "http://localhost:2317"
