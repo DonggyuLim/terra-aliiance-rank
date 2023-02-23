@@ -1,6 +1,7 @@
 package data
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"sync"
@@ -9,7 +10,9 @@ import (
 	"github.com/DonggyuLim/Alliance-Rank/account"
 	"github.com/DonggyuLim/Alliance-Rank/db"
 	"github.com/DonggyuLim/Alliance-Rank/utils"
+	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -89,14 +92,11 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			fmt.Printf("chain: %v  height: %v delecount: %v  lastblock:%v \n", chainCode, height, len(delegations), lastBlock)
 		}
 
-		w := &sync.WaitGroup{}
-		w.Add(len(delegations))
-
+		g, _ := errgroup.WithContext(context.Background())
 		for i := 0; i <= len(delegations)-1; i++ {
 			delegation := delegations[i].Delegation
 
-			go func() {
-				// fmt.Println("Go Routine Start!")
+			g.Go(func() error {
 				resReward, err := GetRewards(
 					chainCode,
 					height,
@@ -106,6 +106,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				)
 				if err != nil || len(resReward) == 0 {
 					fmt.Printf("chain: %v Not Reward!\n", chainCode)
+					return err
 				}
 				reward := account.Reward{
 					LastHeight: uint(height),
@@ -147,7 +148,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				}
 				filter := bson.D{{Key: "address", Value: utils.MakeAddress(delegation.DelegatorAddress)}}
 				a, ok := db.FindOne(filter)
-				// fmt.Println(ok)
+				fmt.Println(ok)
 				switch ok {
 				case nil:
 					fmt.Println("Exsits!!!")
@@ -334,10 +335,13 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					a.SetAccount(delegation.DelegatorAddress, delegation.ValidatorAddress, reward, chainCode)
 					db.Insert(a)
 				}
-			}()
-			w.Done()
+				return nil
+			})
+
 		}
-		w.Wait()
+		if err := g.Wait(); err != nil {
+			log.Error(err)
+		}
 		height += 1
 	}
 
