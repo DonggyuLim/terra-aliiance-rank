@@ -141,6 +141,23 @@ func Find(key, value, desc string, limit int64) ([]account.Account, error) {
 	return curs, err
 }
 
+func FindAll() ([]account.Account, error) {
+	d.Mutex.Lock()
+	defer d.Mutex.Unlock()
+	exp := 5 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), exp)
+	defer cancel()
+	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	findOptions := options.Find()
+
+	filter := bson.D{}
+
+	cur, _ := collection.Find(ctx, filter, findOptions)
+	var curs []account.Account
+	err := cur.All(context.TODO(), &curs)
+	return curs, err
+}
+
 func FindAndReplace(filter, update bson.D) {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)

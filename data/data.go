@@ -49,7 +49,7 @@ func MakeTotal(wg *sync.WaitGroup) {
 	for {
 		time.Sleep(time.Second * 60)
 		fmt.Println("Total!")
-		accountList, err := db.Find("", "", "total.total", 100000000)
+		accountList, err := db.FindAll()
 		if err != nil || len(accountList) == 0 {
 			fmt.Println("Make Total None")
 			continue
