@@ -63,9 +63,9 @@ func MakeTotal(wg *sync.WaitGroup) {
 }
 
 func MakeReward(chainCode int) {
-
+	height := 10
 	for {
-		height := 10
+
 		// height := ReturnHeight(chainCode)
 		// WriteHeight(chainCode, height+1)
 		lastBlock := GetLastBlock(chainCode)
@@ -78,7 +78,7 @@ func MakeReward(chainCode int) {
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
 			fmt.Printf("chain : %v height: %v Not Delegate\n", chainCode, height)
-
+			height += 1
 			continue
 		}
 
@@ -307,6 +307,7 @@ func MakeReward(chainCode int) {
 			}()
 			wg.Wait()
 		}
+		height += 1
 	}
 }
 
