@@ -71,7 +71,7 @@ func MakeTotal(wg *sync.WaitGroup) {
 
 func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	defer wg.Done()
-	height := 100961
+	height := 10
 	for {
 		lastBlock := GetLastBlock(chainCode)
 		if height >= GetLastBlock(chainCode) {
@@ -322,7 +322,6 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					a.SetAccount(delegation.DelegatorAddress, delegation.ValidatorAddress, reward, chainCode)
 					db.Insert(a)
 				}
-
 			}()
 			w.Done()
 		}
