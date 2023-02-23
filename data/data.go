@@ -48,7 +48,7 @@ func MakeTotal(wg *sync.WaitGroup) {
 		fmt.Println("Total!")
 		accountList, err := db.Find("", "", "total.total", 100000000)
 		if err != nil || len(accountList) == 0 {
-			time.Sleep(time.Minute * 1)
+			time.Sleep(time.Second * 300)
 			continue
 		}
 		for _, account := range accountList {
@@ -65,7 +65,7 @@ func MakeTotal(wg *sync.WaitGroup) {
 			}
 			db.UpdateOneMap(filter, update)
 		}
-		time.Sleep(time.Minute * 1)
+		time.Sleep(time.Second * 300)
 	}
 
 }
