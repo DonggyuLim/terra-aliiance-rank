@@ -87,7 +87,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		}
 
 		fmt.Printf("chain: %v  height: %v delecount: %v  lastblock:%v \n", chainCode, height, len(delegations), lastBlock)
-		w := sync.WaitGroup{}
+		w := &sync.WaitGroup{}
 		w.Add(len(delegations))
 		for i := 0; i < len(delegations); i++ {
 			delegation := delegations[i].Delegation
@@ -144,10 +144,12 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				a, ok := db.FindOne(filter)
 				switch ok {
 				case nil:
+
 					switch chainCode {
 					case 0:
 						o := a.Atreides.Rewards[delegation.ValidatorAddress]
 						if o.UAtr > reward.UAtr {
+							fmt.Println("Claim")
 							claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Atreides.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Atreides.Claim.SORD
@@ -170,6 +172,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							}
 							db.UpdateOne(filter, update)
 						} else {
+							fmt.Println("Update Reward!")
 							update := bson.D{{
 								Key: "$set", Value: bson.D{
 									{Key: "atreides", Value: bson.D{
@@ -187,6 +190,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					case 1:
 						o := a.Harkonnen.Rewards[delegation.ValidatorAddress]
 						if o.UHar > reward.UHar {
+							fmt.Println("Claim")
 							claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Harkonnen.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Harkonnen.Claim.SORD
@@ -209,6 +213,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							}
 							db.UpdateOne(filter, update)
 						} else {
+							fmt.Println("Update Reward!")
 							update := bson.D{{
 								Key: "$set", Value: bson.D{
 									{Key: "harkonnen", Value: bson.D{
@@ -224,8 +229,10 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 
 					case 2:
+
 						o := a.Corrino.Rewards[delegation.ValidatorAddress]
 						if o.UCor > reward.UCor {
+							fmt.Println("Claim")
 							claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Corrino.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Corrino.Claim.SORD
@@ -248,6 +255,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							}
 							db.UpdateOne(filter, update)
 						} else {
+							fmt.Println("Update Reward!")
 							update := bson.D{{
 								Key: "$set", Value: bson.D{
 									{Key: "corrino", Value: bson.D{
@@ -264,6 +272,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					case 3:
 						o := a.Ordos.Rewards[delegation.ValidatorAddress]
 						if o.UOrd > reward.UOrd {
+							fmt.Println("Claim")
 							claimCor := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
@@ -287,6 +296,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							}
 							db.UpdateOne(filter, update)
 						} else {
+							fmt.Println("Update Reward!")
 							update := bson.D{{
 								Key: "$set", Value: bson.D{
 									{Key: "ordos", Value: bson.D{

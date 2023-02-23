@@ -145,7 +145,7 @@ func ReplaceOne(filter bson.D, account account.Account) {
 }
 
 func UpdateOne(filter, update bson.D) {
-	// fmt.Println("Update")
+	fmt.Println("Update")
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
