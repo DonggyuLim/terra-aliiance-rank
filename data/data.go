@@ -166,7 +166,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimSORD := (o.SORD - reward.SORD) + a.Atreides.Claim.SORD
 							claimUpdate := bson.D{
 								{
-									Key: "$set", Value: bson.D{
+									Key: "$replaceWith", Value: bson.D{
 										{Key: "atreides.claim", Value: bson.D{
 											{Key: "uatr", Value: claimAtr},
 											{Key: "scor", Value: claimSCOR},
@@ -191,7 +191,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							fmt.Println("Update Reward!")
 							update := bson.D{
 								{
-									Key: "$set", Value: bson.D{
+									Key: "$replaceWith", Value: bson.D{
 										{Key: "atreides.reward", Value: bson.D{
 											{Key: delegation.ValidatorAddress, Value: reward},
 										},
@@ -211,7 +211,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimSORD := (o.SORD - reward.SORD) + a.Harkonnen.Claim.SORD
 							claimUpdate := bson.D{
 								{
-									Key: "$set", Value: bson.D{
+									Key: "$replaceWith", Value: bson.D{
 										{Key: "harkonnen.claim", Value: bson.D{
 											{Key: "uhar", Value: claimhar},
 											{Key: "scor", Value: claimSCOR},
@@ -234,7 +234,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							fmt.Println("Update Reward!")
 							update := bson.D{
 								{
-									Key: "$set", Value: bson.D{
+									Key: "$replaceWith", Value: bson.D{
 										{Key: "harkonnen.reward", Value: bson.D{
 											{Key: delegation.ValidatorAddress, Value: reward},
 										},
@@ -256,7 +256,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimSORD := (o.SORD - reward.SORD) + a.Corrino.Claim.SORD
 							claimUpdate := bson.D{
 								{
-									Key: "$set", Value: bson.D{
+									Key: "$replaceWith", Value: bson.D{
 										{Key: "corrino.claim", Value: bson.D{
 											{Key: "ucor", Value: claimCor},
 											{Key: "scor", Value: claimSCOR},
@@ -264,7 +264,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										},
 										},
 										{
-											Key: "$set", Value: bson.D{
+											Key: "$replaceWith", Value: bson.D{
 												{Key: "corrino.reward", Value: bson.D{
 													{Key: delegation.ValidatorAddress, Value: reward},
 												},
@@ -279,7 +279,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							fmt.Println("Update Reward!")
 							update := bson.D{
 								{
-									Key: "$set", Value: bson.D{
+									Key: "$replaceWith", Value: bson.D{
 										{Key: "corrino.reward", Value: bson.D{
 											{Key: delegation.ValidatorAddress, Value: reward},
 										},
@@ -299,7 +299,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
 							claimUpdate := bson.D{
 								{
-									Key: "$set", Value: bson.D{
+									Key: "$replaceWith", Value: bson.D{
 										{Key: "ordos.claim", Value: bson.D{
 											{Key: "uord", Value: claimOrd},
 											{Key: "scor", Value: claimSCOR},
@@ -307,7 +307,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										},
 										},
 										{
-											Key: "$set", Value: bson.D{
+											Key: "$replaceWith", Value: bson.D{
 												{Key: "ordos.reward", Value: bson.D{
 													{Key: delegation.ValidatorAddress, Value: reward},
 												},
@@ -322,7 +322,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							fmt.Println("Update Reward!")
 							update := bson.D{
 								{
-									Key: "$set", Value: bson.D{
+									Key: "$replaceWith", Value: bson.D{
 										{Key: "ordos.reward", Value: bson.D{
 											{Key: delegation.ValidatorAddress, Value: reward},
 										},
