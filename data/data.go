@@ -31,10 +31,10 @@ func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
 	w := &sync.WaitGroup{}
 	w.Add(5)
-	// go MakeReward(w, ATREIDES)
-	// go MakeReward(w, Harkonnen)
+	go MakeReward(w, ATREIDES)
+	go MakeReward(w, Harkonnen)
 	go MakeReward(w, CORRINO)
-	// go MakeReward(w, ORDOS)
+	go MakeReward(w, ORDOS)
 	go MakeTotal(w)
 	wg.Wait()
 }
@@ -43,7 +43,7 @@ func MakeTotal(wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	for {
-		time.Sleep(time.Second * 300)
+		time.Sleep(time.Second * 60)
 		fmt.Println("Total!")
 		accountList, err := db.Find("", "", "total.total", 100000000)
 		if err != nil || len(accountList) == 0 {
@@ -91,13 +91,12 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 		w := &sync.WaitGroup{}
 		w.Add(len(delegations))
-		fmt.Println("w :", w)
-		fmt.Println("delegation loop start!")
+
 		for i := 0; i <= len(delegations)-1; i++ {
 			delegation := delegations[i].Delegation
-			fmt.Println("delegation : ", delegation)
+
 			go func() {
-				fmt.Println("Go Routine Start!")
+				// fmt.Println("Go Routine Start!")
 				resReward, err := GetRewards(
 					chainCode,
 					height,
@@ -106,7 +105,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					delegation.Denom,
 				)
 				if err != nil || len(resReward) == 0 {
-					fmt.Println("Not Reward!")
+					fmt.Printf("chain: %v Not Reward!\n", chainCode)
 				}
 				reward := account.Reward{
 					LastHeight: uint(height),
@@ -117,7 +116,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					SCOR:       0,
 					SORD:       0,
 				}
-				fmt.Println("reward loop start!")
+				// fmt.Println("reward loop start!")
 				for _, re := range resReward {
 					switch re.Denom {
 					case sCOR:
@@ -146,9 +145,9 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						reward.UOrd = uint(amount)
 					}
 				}
-				filter := bson.D{{Key: "address", Value: delegation.DelegatorAddress}}
+				filter := bson.D{{Key: "address", Value: utils.MakeAddress(delegation.DelegatorAddress)}}
 				a, ok := db.FindOne(filter)
-				fmt.Println(ok)
+				// fmt.Println(ok)
 				switch ok {
 				case nil:
 					fmt.Println("Exsits!!!")
