@@ -91,11 +91,13 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 		w := &sync.WaitGroup{}
 		w.Add(len(delegations))
+		fmt.Println("w Count:", w)
 		fmt.Println("delegation loop start!")
 		for i := 0; i < len(delegations); i++ {
 			delegation := delegations[i].Delegation
-
+			fmt.Println("delegation : ", delegation)
 			go func() {
+				fmt.Println("Go Routine Start!")
 				resReward, err := GetRewards(
 					chainCode,
 					height,
