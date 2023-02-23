@@ -38,6 +38,7 @@ func Main(wg *sync.WaitGroup) {
 }
 
 func MakeTotal(wg *sync.WaitGroup) {
+	fmt.Println("Total!")
 	for {
 		accountList, err := db.Find("", "", "total.total", 100000000)
 		if err != nil {
@@ -74,11 +75,11 @@ func MakeReward(chainCode int) {
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
 			fmt.Printf("chain : %v height: %v Not Delegate\n", chainCode, height)
-			height += 1
+			WriteHeight(chainCode, height+1)
 			continue
 		}
 
-		fmt.Printf("chain:%v height:%v count:%v\n", chainCode, height, len(delegations))
+		fmt.Printf("chain:%v  height:%v count:%v\n", chainCode, height, len(delegations))
 		for i := 0; i < len(delegations); i++ {
 			delegation := delegations[i].Delegation
 
@@ -91,7 +92,6 @@ func MakeReward(chainCode int) {
 					delegation.Denom,
 				)
 				if err != nil || len(resReward) == 0 {
-					// fmt.Printf("%v %v Not Reward\n", chainCode, height)
 					return
 				}
 				reward := account.Reward{
@@ -294,6 +294,7 @@ func MakeReward(chainCode int) {
 					}
 
 				case mongo.ErrNoDocuments:
+					fmt.Println("New Account!")
 					a.SetAccount(delegation.DelegatorAddress, delegation.ValidatorAddress, reward, chainCode)
 					db.Insert(a)
 				}
