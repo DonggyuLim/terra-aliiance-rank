@@ -91,7 +91,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 		w := &sync.WaitGroup{}
 		w.Add(len(delegations))
-
+		fmt.Println("delegation loop start!")
 		for i := 0; i < len(delegations); i++ {
 			delegation := delegations[i].Delegation
 
@@ -115,6 +115,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					SCOR:       0,
 					SORD:       0,
 				}
+				fmt.Println("reward loop start!")
 				for _, re := range resReward {
 					switch re.Denom {
 					case sCOR:
@@ -145,6 +146,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				}
 				filter := bson.D{{Key: "address", Value: delegation.DelegatorAddress}}
 				a, ok := db.FindOne(filter)
+				fmt.Println(ok)
 				switch ok {
 				case nil:
 					fmt.Println("Exsits!!!")
