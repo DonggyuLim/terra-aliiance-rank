@@ -60,7 +60,6 @@ func MakeTotal(wg *sync.WaitGroup) {
 func MakeReward(chainCode int) {
 	height := 10
 	for height <= GetLastBlock(chainCode) {
-		height += 1
 
 		if height > GetLastBlock(chainCode) {
 			height = GetLastBlock(chainCode)
@@ -69,7 +68,8 @@ func MakeReward(chainCode int) {
 		delegationsData, err := GetDelegations(height, chainCode)
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
-			fmt.Printf("%v %v Not Delegate\n", chainCode, height)
+			fmt.Printf("chain : %v height: %v Not Delegate\n", chainCode, height)
+			height += 1
 			continue
 		}
 
@@ -295,7 +295,7 @@ func MakeReward(chainCode int) {
 
 			}()
 		}
-
+		height += 1
 	}
 }
 
