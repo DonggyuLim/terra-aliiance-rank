@@ -323,11 +323,11 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					a.SetAccount(delegation.DelegatorAddress, delegation.ValidatorAddress, reward, chainCode)
 					db.Insert(a)
 				}
-				w.Done()
-			}()
 
-			w.Wait()
+			}()
+			w.Done()
 		}
+		w.Wait()
 		height += 1
 	}
 
