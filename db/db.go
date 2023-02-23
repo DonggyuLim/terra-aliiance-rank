@@ -157,7 +157,7 @@ func FindAll() ([]account.Account, error) {
 	if err != nil {
 		return curs, err
 	}
-	err := cur.All(context.TODO(), &curs)
+	err = cur.All(context.TODO(), &curs)
 	return curs, err
 }
 
