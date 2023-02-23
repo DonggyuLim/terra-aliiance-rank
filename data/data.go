@@ -75,8 +75,9 @@ func MakeTotal(wg *sync.WaitGroup) {
 
 func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	defer wg.Done()
-	height := ReturnHeight(chainCode)
+
 	for {
+		height := ReturnHeight(chainCode)
 		WriteHeight(chainCode, height+1)
 		lastBlock := GetLastBlock(chainCode)
 		if height >= GetLastBlock(chainCode) {
