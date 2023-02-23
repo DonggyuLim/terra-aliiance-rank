@@ -9,7 +9,6 @@ import (
 	"github.com/DonggyuLim/Alliance-Rank/db"
 	"github.com/DonggyuLim/Alliance-Rank/utils"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 const (
@@ -75,11 +74,12 @@ func MakeReward(chainCode int) {
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
 			fmt.Printf("chain : %v height: %v Not Delegate\n", chainCode, height)
-
 			continue
 		}
 
-		fmt.Printf("chain:%v  height:%v count:%v \n", chainCode, height, len(delegations))
+		fmt.Printf("chain: %v  height: %v count: %v \n", chainCode, height, len(delegations))
+		wg := sync.WaitGroup{}
+		wg.Add(len(delegations))
 		for i := 0; i < len(delegations); i++ {
 			delegation := delegations[i].Delegation
 
@@ -293,15 +293,15 @@ func MakeReward(chainCode int) {
 						}
 					}
 
-				case mongo.ErrNoDocuments:
+				default:
 					fmt.Println("New Account!")
 					a.SetAccount(delegation.DelegatorAddress, delegation.ValidatorAddress, reward, chainCode)
 					db.Insert(a)
 				}
-
+				wg.Done()
 			}()
 		}
-
+		wg.Wait()
 	}
 }
 
