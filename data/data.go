@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/DonggyuLim/Alliance-Rank/account"
 	"github.com/DonggyuLim/Alliance-Rank/db"
@@ -62,13 +63,13 @@ func MakeTotal(wg *sync.WaitGroup) {
 }
 
 func MakeReward(chainCode int) {
-	height := ReturnHeight(chainCode)
 
-	for height <= GetLastBlock(chainCode) {
-
+	for {
+		height := ReturnHeight(chainCode)
 		lastBlock := GetLastBlock(chainCode)
 		if height >= GetLastBlock(chainCode) {
 			height = lastBlock
+			time.Sleep(2 * time.Second)
 		}
 		fmt.Printf("%v chain Last block : %v \n", chainCode, lastBlock)
 		delegationsData, err := GetDelegations(height, chainCode)
