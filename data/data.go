@@ -40,25 +40,30 @@ func Main(wg *sync.WaitGroup) {
 func MakeTotal(wg *sync.WaitGroup) {
 	for {
 		accountList, err := db.Find("", "", "total.total", 100000000)
-		utils.PanicError(err)
-		// total :=
+		if err != nil {
+			continue
+		}
 		for _, account := range accountList {
 			account.CalculateTotal()
 			filter := bson.D{{Key: "address", Value: account.Address}}
 			update := bson.M{
-				"atreides.total":  account.Atreides.Total,
-				"harkonnen.total": account.Harkonnen.Total,
-				"corrino.total":   account.Corrino.Total,
-				"ordos.total":     account.Ordos.Total,
-				"total":           account.Total,
+				"$set": bson.M{
+					"atreides.total":  account.Atreides.Total,
+					"harkonnen.total": account.Harkonnen.Total,
+					"corrino.total":   account.Corrino.Total,
+					"ordos.total":     account.Ordos.Total,
+					"total":           account.Total,
+				},
 			}
 			db.UpdateOneMap(filter, update)
 		}
 	}
 
 }
+
 func MakeReward(chainCode int) {
-	height := 10
+	height := ReturnHeight(chainCode)
+
 	for height <= GetLastBlock(chainCode) {
 
 		if height > GetLastBlock(chainCode) {
@@ -295,7 +300,7 @@ func MakeReward(chainCode int) {
 
 			}()
 		}
-		height += 1
+		WriteHeight(chainCode, height+1)
 	}
 }
 

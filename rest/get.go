@@ -25,6 +25,11 @@ func Root(c *gin.Context) {
 	fmt.Println("ROOT")
 	list, err := db.Find("", "", "total.total", 100)
 	// fmt.Println(list)
+	if err != nil {
+		fmt.Println(err)
+		c.String(404, err.Error())
+		return
+	}
 	var res []ToTalResponse
 	for _, el := range list {
 		total := ToTalResponse{
@@ -39,11 +44,7 @@ func Root(c *gin.Context) {
 		}
 		res = append(res, total)
 	}
-	if err != nil {
-		fmt.Println(err)
-		c.String(404, err.Error())
-		return
-	}
+
 	c.JSON(200, res)
 }
 

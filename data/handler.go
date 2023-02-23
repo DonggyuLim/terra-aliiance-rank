@@ -87,3 +87,39 @@ func GetLastBlock(chainCode int) int {
 	return latestHeight
 
 }
+
+func ReturnHeight(chainCode int) int {
+	var height int
+	switch chainCode {
+	case 0:
+		i, err := strconv.Atoi(utils.LoadENV("HEIGHT", "atr.env"))
+		utils.PanicError(err)
+		height = i
+	case 1:
+		i, err := strconv.Atoi(utils.LoadENV("HEIGHT", "har.env"))
+		utils.PanicError(err)
+		height = i
+	case 2:
+		i, err := strconv.Atoi(utils.LoadENV("HEIGHT", "cor.env"))
+		utils.PanicError(err)
+		height = i
+	case 3:
+		i, err := strconv.Atoi(utils.LoadENV("HEIGHT", "ord.env"))
+		utils.PanicError(err)
+		height = i
+	}
+	return height
+}
+
+func WriteHeight(chainCode, height int) {
+	switch chainCode {
+	case 0:
+		utils.WriteENV("HEIGHT", fmt.Sprintf("%v", height), "atr.env")
+	case 1:
+		utils.WriteENV("HEIGHT", fmt.Sprintf("%v", height), "har.env")
+	case 2:
+		utils.WriteENV("HEIGHT", fmt.Sprintf("%v", height), "cor.env")
+	case 3:
+		utils.WriteENV("HEIGHT", fmt.Sprintf("%v", height), "ord.env")
+	}
+}
