@@ -47,6 +47,7 @@ func MakeTotal(wg *sync.WaitGroup) {
 		fmt.Println("Total!")
 		accountList, err := db.Find("", "", "total.total", 100000000)
 		if err != nil || len(accountList) == 0 {
+			fmt.Println("Make Total None")
 			continue
 		}
 		for _, account := range accountList {
@@ -84,11 +85,13 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
 			height += 1
 			continue
+		} else {
+			fmt.Printf("chain: %v  height: %v delecount: %v  lastblock:%v \n", chainCode, height, len(delegations), lastBlock)
 		}
 
-		fmt.Printf("chain: %v  height: %v delecount: %v  lastblock:%v \n", chainCode, height, len(delegations), lastBlock)
 		w := &sync.WaitGroup{}
 		w.Add(len(delegations))
+
 		for i := 0; i < len(delegations); i++ {
 			delegation := delegations[i].Delegation
 
@@ -144,7 +147,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				a, ok := db.FindOne(filter)
 				switch ok {
 				case nil:
-
+					fmt.Println("Update!!!!!!!!!!!!!!")
 					switch chainCode {
 					case 0:
 						o := a.Atreides.Rewards[delegation.ValidatorAddress]
