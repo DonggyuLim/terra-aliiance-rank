@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"sync"
 	"time"
@@ -10,7 +11,7 @@ import (
 	"github.com/DonggyuLim/Alliance-Rank/account"
 	"github.com/DonggyuLim/Alliance-Rank/db"
 	"github.com/DonggyuLim/Alliance-Rank/utils"
-	"github.com/rs/zerolog/log"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/sync/errgroup"
 )
@@ -340,7 +341,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 		}
 		if err := g.Wait(); err != nil {
-			log.Error(err)
+			log.Panicln(err.Error())
 		}
 		height += 1
 	}
