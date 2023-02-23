@@ -107,7 +107,6 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				)
 				if err != nil || len(resReward) == 0 {
 					fmt.Println("Not Reward!")
-					return
 				}
 				reward := account.Reward{
 					LastHeight: uint(height),
