@@ -70,7 +70,7 @@ func MakeReward(chainCode int) {
 		if height >= GetLastBlock(chainCode) {
 			height = lastBlock
 		}
-		fmt.Printf("%v chain Last block : %v ", chainCode, lastBlock)
+		fmt.Printf("%v chain Last block : %v \n", chainCode, lastBlock)
 		delegationsData, err := GetDelegations(height, chainCode)
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
@@ -301,8 +301,8 @@ func MakeReward(chainCode int) {
 				}
 				wg.Done()
 			}()
+			wg.Wait()
 		}
-		wg.Wait()
 	}
 }
 
