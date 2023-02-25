@@ -18,24 +18,23 @@ import (
 )
 
 type DB struct {
-	db             *mongo.Client
-	url            string
-	dbName         string
-	collection     string
-	collectionName string
+	db         *mongo.Client
+	url        string
+	dbName     string
+	collection string
 	sync.Mutex
 }
 
 var d DB
 
 func Connect() {
-	db := DB{}
-	db.url = utils.LoadENV("DBURL", "db.env")
-	db.dbName = utils.LoadENV("DBNAME", "db.env")
-	db.collection = utils.LoadENV("Collection", "db.env")
+
+	d.url = utils.LoadENV("DBURL", "db.env")
+	d.dbName = utils.LoadENV("DBNAME", "db.env")
+	d.collection = utils.LoadENV("Collection", "db.env")
 	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().
-		ApplyURI(db.url).
+		ApplyURI(d.url).
 		SetServerAPIOptions(serverAPIOptions)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -45,8 +44,8 @@ func Connect() {
 		panic(err)
 	}
 
-	db.db = client
-	d = db
+	d.db = client
+	// fmt.Println(d)
 	fmt.Println("============DB connect==================")
 }
 
@@ -67,7 +66,7 @@ func Insert(account account.Account) error {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 	insertResult, err := collection.InsertOne(ctx, account)
 	if err != nil {
 		return err
@@ -87,7 +86,7 @@ func InsertMany(data []account.Account) {
 	exp := 20 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 	_, err := collection.InsertMany(ctx, a)
 
 	if err != nil {
@@ -104,7 +103,7 @@ func FindOne(filter bson.D) (account.Account, error) {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 	err := collection.FindOne(ctx, filter).Decode(&a)
 
 	if err != nil {
@@ -123,7 +122,7 @@ func Find(key, value, desc string, limit int64) ([]account.Account, error) {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 	findOptions := options.Find()
 
 	findOptions.SetLimit(limit)
@@ -147,7 +146,7 @@ func FindAll() ([]account.Account, error) {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 	findOptions := options.Find()
 
 	filter := bson.D{}
@@ -165,7 +164,7 @@ func FindAndReplace(filter, update bson.D) {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 
 	result := collection.FindOneAndReplace(ctx, filter, update)
 	fmt.Println("DB update")
@@ -177,7 +176,7 @@ func ReplaceOne(filter bson.D, account account.Account) {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 
 	_, err := collection.ReplaceOne(ctx, filter, account)
 
@@ -187,14 +186,14 @@ func ReplaceOne(filter bson.D, account account.Account) {
 func UpdateOne(filter, update bson.D) {
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
-	fmt.Println("Update")
+
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 	_, err := collection.UpdateOne(ctx, filter, update)
-	// utils.PanicError(err)
-	fmt.Println(err.Error())
+
+	utils.PanicError(err)
 	// fmt.Println("Update End!")
 }
 
@@ -204,9 +203,10 @@ func UpdateOneMap(filter bson.D, update bson.M) {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 	_, err := collection.UpdateOne(ctx, filter, update)
 	utils.PanicError(err)
+	// fmt.Println(err.Error())
 }
 
 func FindChain(address string, chainCode int, c *account.Reward) error {
@@ -215,7 +215,7 @@ func FindChain(address string, chainCode int, c *account.Reward) error {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collectionName)
+	collection := d.db.Database(d.dbName).Collection(d.collection)
 
 	var projection bson.D
 	switch chainCode {

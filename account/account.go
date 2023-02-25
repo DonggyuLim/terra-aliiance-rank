@@ -9,55 +9,55 @@ import (
 )
 
 type Account struct {
-	Address   string `bson:"address" json:"address"`
-	Atreides  Chain  `bson:"atreides" json:"atreides"`
-	Harkonnen Chain  `bson:"harkonnen" json:"harkonnen"`
-	Corrino   Chain  `bson:"corrino" json:"corrino"`
-	Ordos     Chain  `bson:"ordos" json:"ordos"`
-	Total     Total  `bson:"total" json:"total"`
+	Address   string `json:"address"`
+	Atreides  Chain  `json:"atreides"`
+	Harkonnen Chain  `json:"harkonnen"`
+	Corrino   Chain  `json:"corrino"`
+	Ordos     Chain  `json:"ordos"`
+	Total     Total  `json:"total"`
 }
 type Chain struct {
-	Address string            `bson:"address" json:"address"`
-	Rewards map[string]Reward `bson:"reward" json:"rewards"` //key = validator Address
-	Claim   Claim             `bson:"claim" json:"claim"`
-	Total   ChainTotal        `bson:"total" json:"total"`
+	Address string            `json:"address"`
+	Rewards map[string]Reward `json:"rewards"` //key = validator Address
+	Claim   Claim             `json:"claim"`
+	Total   ChainTotal        `json:"total"`
 }
 
 type Reward struct {
-	LastHeight uint `bson:"last_height" json:"last_height"`
-	UAtr       uint `bson:"uatr" json:"uatr"`
-	UHar       uint `bson:"uhar" json:"uhar"`
-	UOrd       uint `bson:"uord" json:"uord"`
-	UCor       uint `bson:"ucor" json:"ucor"`
-	SCOR       uint `bson:"scor" json:"scor"`
-	SORD       uint `bson:"sord" json:"sord"`
+	LastHeight int ` json:"last_height"`
+	UAtr       int ` json:"uatr"`
+	UHar       int `json:"uhar"`
+	UOrd       int ` json:"uord"`
+	UCor       int ` json:"ucor"`
+	SCOR       int ` json:"scor"`
+	SORD       int ` json:"sord"`
 }
 
 type Claim struct {
-	UAtr uint `json:"uatr"`
-	UCor uint `json:"ucor"`
-	UHar uint `json:"uhar"`
-	UOrd uint `json:"uord"`
-	SCOR uint `json:"scor"`
-	SORD uint `json:"sord"`
+	UAtr int `json:"uatr"`
+	UCor int `json:"ucor"`
+	UHar int `json:"uhar"`
+	UOrd int `json:"uord"`
+	SCOR int `json:"scor"`
+	SORD int `json:"sord"`
 }
 type Total struct {
-	UAtr  uint `json:"uatr"`
-	UCor  uint `json:"ucor"`
-	UHar  uint `json:"uhar"`
-	UOrd  uint `json:"uord"`
-	SCOR  uint `json:"scor"`
-	SORD  uint `json:"sord"`
-	Total uint `json:"total"`
+	UAtr  int ` json:"uatr"`
+	UCor  int ` json:"ucor"`
+	UHar  int ` json:"uhar"`
+	UOrd  int ` json:"uord"`
+	SCOR  int ` json:"scor"`
+	SORD  int ` json:"sord"`
+	Total int `json:"total"`
 }
 
 type ChainTotal struct {
-	UAtr uint `json:"uatr"`
-	UCor uint `json:"ucor"`
-	UHar uint `json:"uhar"`
-	UOrd uint `json:"uord"`
-	SCOR uint `json:"scor"`
-	SORD uint `json:"sord"`
+	UAtr int `json:"uatr"`
+	UCor int `json:"ucor"`
+	UHar int `json:"uhar"`
+	UOrd int `json:"uord"`
+	SCOR int `json:"scor"`
+	SORD int `json:"sord"`
 	// Total uint `json:"total"`
 }
 
@@ -67,22 +67,25 @@ func (a *Account) SetAccount(address, validator string, reward Reward, chainCode
 	m2 := make(map[string]Reward)
 	m3 := make(map[string]Reward)
 	m4 := make(map[string]Reward)
-	a.Address = utils.MakeAddress(address)
+	a.Address = address
 	a.Atreides.Rewards = m1
 	a.Harkonnen.Rewards = m2
 	a.Corrino.Rewards = m3
 	a.Ordos.Rewards = m4
 	switch chainCode {
 	case 0:
+		a.Atreides.Address = address
 		a.Atreides.Rewards[validator] = reward
 	case 1:
+		a.Harkonnen.Address = address
 		a.Harkonnen.Rewards[validator] = reward
 	case 2:
+		a.Corrino.Address = address
 		a.Corrino.Rewards[validator] = reward
 	case 3:
+		a.Ordos.Address = address
 		a.Ordos.Rewards[validator] = reward
 	}
-
 }
 
 func (a Account) EncodeByte() []byte {
@@ -147,7 +150,7 @@ func (c *Chain) UpdateClaimAndReward(
 
 func (c *Chain) UpdateUndelegate(chainCode, height int) {
 	deleteKey := []string{}
-	h := uint(height)
+	h := height
 	switch chainCode {
 	case 0:
 		for k, v := range c.Rewards {

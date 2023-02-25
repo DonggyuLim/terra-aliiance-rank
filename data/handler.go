@@ -111,10 +111,8 @@ func ReturnHeight(chainCode int) int {
 }
 
 func WriteHeight(chainCode, height int) {
-	fmt.Println(height)
 	switch chainCode {
 	case 0:
-
 		utils.WriteENV("HEIGHT", strconv.Itoa(height), "atr.env")
 	case 1:
 		utils.WriteENV("HEIGHT", strconv.Itoa(height), "har.env")
