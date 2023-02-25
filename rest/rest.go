@@ -17,7 +17,7 @@ func Start(wg *sync.WaitGroup) {
 	//CORS
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"GET", "POST"},
+		AllowMethods: []string{"GET"},
 		MaxAge:       12 * time.Hour,
 	}))
 
