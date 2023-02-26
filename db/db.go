@@ -200,7 +200,7 @@ func UpdateOne(filter, update bson.D) {
 func UpdateOneMap(filter bson.D, update bson.M) {
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
-	exp := 5 * time.Second
+	exp := 10 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
 	collection := d.db.Database(d.dbName).Collection(d.collection)

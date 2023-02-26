@@ -78,13 +78,13 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	defer wg.Done()
 	height := ReturnHeight(chainCode)
 	// height := 10000
-	for height <= GetLastBlock(chainCode) {
+	for {
 
 		lastBlock := GetLastBlock(chainCode)
 		if height > lastBlock {
-
-			height = lastBlock
-			time.Sleep(2 * time.Second)
+			fmt.Println("height > lastblock")
+			time.Sleep(time.Minute * 1)
+			continue
 		}
 
 		delegationsData, err := GetDelegations(height, chainCode)
