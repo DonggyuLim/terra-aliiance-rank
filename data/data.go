@@ -275,7 +275,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										},
 										},
 
-										{Key: "$corrino.rewards", Value: bson.D{
+										{Key: "corrino.rewards", Value: bson.D{
 											{Key: fmt.Sprintf("corrino.rewards.%s.ucor", delegation.ValidatorAddress), Value: reward.UHar},
 											{Key: fmt.Sprintf("corrino.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 											{Key: fmt.Sprintf("corrino.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
@@ -308,6 +308,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
 							// utils.PrettyJson(resReward)
+
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
 							claimUpdate := bson.D{
