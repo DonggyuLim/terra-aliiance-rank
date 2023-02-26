@@ -39,7 +39,7 @@ func Main(wg *sync.WaitGroup) {
 	go MakeReward(w, ATREIDES)
 	go MakeReward(w, Harkonnen)
 	go MakeReward(w, CORRINO)
-	// go MakeReward(w, ORDOS)
+	go MakeReward(w, ORDOS)
 	go MakeTotal(w)
 	wg.Wait()
 }
