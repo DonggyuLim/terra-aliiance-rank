@@ -168,7 +168,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 						if o.UAtr > reward.UAtr && (percent.PercentOf(claimAtr, o.UAtr) >= 10) {
 							//Tax 제외
-							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
+							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
 							// utils.PrettyJson(resReward)
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Atreides.Claim.SCOR
@@ -214,7 +214,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
 						if o.UHar > reward.UHar && (percent.PercentOf(claimhar, o.UHar) >= 10) {
 
-							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
+							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
 							// utils.PrettyJson(resReward)
 
@@ -260,7 +260,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
 						if o.UCor > reward.UCor && (percent.PercentOf(claimCor, o.UCor) >= 10) {
 
-							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
+							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
 							// utils.PrettyJson(resReward)
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Corrino.Claim.SCOR
@@ -269,14 +269,14 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								{
 									Key: "$set", Value: bson.D{
 										{Key: "corrino.claim", Value: bson.D{
-											{Key: fmt.Sprintf("corrino.claim.%s.uhar", delegation.ValidatorAddress), Value: claimCor},
+											{Key: fmt.Sprintf("corrino.claim.%s.ucor", delegation.ValidatorAddress), Value: claimCor},
 											{Key: fmt.Sprintf("corrino.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
 											{Key: fmt.Sprintf("corrino.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
 										},
 										},
 
 										{Key: "$corrino.rewards", Value: bson.D{
-											{Key: fmt.Sprintf("corrino.rewards.%s.uhar", delegation.ValidatorAddress), Value: reward.UHar},
+											{Key: fmt.Sprintf("corrino.rewards.%s.ucor", delegation.ValidatorAddress), Value: reward.UHar},
 											{Key: fmt.Sprintf("corrino.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 											{Key: fmt.Sprintf("corrino.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										},
@@ -305,7 +305,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						claimOrd := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
 						if o.UOrd > reward.UOrd && (percent.PercentOf(claimOrd, o.UOrd) >= 10) {
 
-							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
+							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
 							// utils.PrettyJson(resReward)
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
