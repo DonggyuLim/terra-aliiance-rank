@@ -83,9 +83,10 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		lastBlock := GetLastBlock(chainCode)
 		if height > lastBlock {
 			fmt.Printf("height : %v lastblock:%v time lock\n", height, lastBlock)
-			time.Sleep(time.Minute * 1)
+			time.Sleep(time.Minute * 5)
 			continue
 		}
+
 		delegationsData, err := GetDelegations(height, chainCode)
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
@@ -111,8 +112,6 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				)
 				if err != nil || len(resReward) == 0 {
 					// fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
-					height += 1
-					WriteHeight(chainCode, height)
 					return err
 				}
 
@@ -126,8 +125,6 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					SORD:       0,
 				}
 				// fmt.Println("reward loop start!")
-				height += 1
-				WriteHeight(chainCode, height)
 				for _, re := range resReward {
 					switch re.Denom {
 					case sCOR:
@@ -407,6 +404,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			})
 
 		}
+		height += 1
+		WriteHeight(chainCode, height+1)
 		if err := g.Wait(); err != nil {
 			log.Panicln(err.Error())
 		}
@@ -414,102 +413,3 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	}
 
 }
-
-// func Controller(a, h, c, o <-chan DataChan, wg *sync.WaitGroup) {
-
-// 	for {
-// 		select {
-// 		case d := <-a:
-// 			fmt.Println("atreides")
-// 			c := account.Chain{}
-// 			ok := db.FindChain(d.Address, ATREIDES, &c)
-// 			switch ok {
-// 			case nil:
-// 				c.UpdateClaimAndReward(
-// 					d.Address,
-// 					d.ValidatorAddress,
-// 					d.Reward,
-// 					ATREIDES,
-// 				)
-// 				c.UpdateUndelegate(0, int(d.Reward.LastHeight))
-// 				filter := bson.D{{Key: "address", Value: utils.MakeKey(d.Address)}}
-// 				update := bson.D{{Key: "$set", Value: bson.D{{Key: "atreides", Value: c}}}}
-// 				db.UpdateOne(filter, update)
-
-// 			case mongo.ErrNoDocuments:
-// 				account := account.Account{}
-// 				account.SetAccount(d.Address, d.ValidatorAddress, d.Reward, ATREIDES)
-// 				db.Insert(account)
-// 			}
-
-// 		case d := <-h:
-// 			fmt.Println("harkonnen")
-// 			c := account.Chain{}
-// 			ok := db.FindChain(d.Address, Harkonnen, &c)
-// 			switch ok {
-// 			case nil:
-// 				c.UpdateUndelegate(Harkonnen, int(d.Reward.LastHeight))
-// 				c.UpdateClaimAndReward(
-// 					d.Address,
-// 					d.ValidatorAddress,
-// 					d.Reward,
-// 					Harkonnen,
-// 				)
-// 				filter := bson.D{{Key: "address", Value: utils.MakeKey(d.Address)}}
-// 				update := bson.D{{Key: "$set", Value: bson.D{{Key: "harkonnen", Value: c}}}}
-// 				db.UpdateOne(filter, update)
-
-// 			case mongo.ErrNoDocuments:
-// 				account := account.Account{}
-// 				account.SetAccount(d.Address, d.ValidatorAddress, d.Reward, Harkonnen)
-// 				db.Insert(account)
-// 			}
-
-// 		case d := <-c:
-// 			fmt.Println("corrino")
-// 			c := account.Chain{}
-// 			ok := db.FindChain(d.Address, CORRINO, &c)
-// 			switch ok {
-// 			case nil:
-// 				c.UpdateUndelegate(CORRINO, int(d.Reward.LastHeight))
-// 				c.UpdateClaimAndReward(
-// 					d.Address,
-// 					d.ValidatorAddress,
-// 					d.Reward,
-// 					CORRINO,
-// 				)
-// 				filter := bson.D{{Key: "address", Value: utils.MakeKey(d.Address)}}
-// 				update := bson.D{{Key: "$set", Value: bson.D{{Key: "corrino", Value: c}}}}
-// 				db.UpdateOne(filter, update)
-
-// 			case mongo.ErrNoDocuments:
-// 				account := account.Account{}
-// 				account.SetAccount(d.Address, d.ValidatorAddress, d.Reward, CORRINO)
-// 				db.Insert(account)
-// 			}
-
-// 		case d := <-o:
-// 			fmt.Println("ordos")
-// 			c := account.Chain{}
-// 			ok := db.FindChain(d.Address, ORDOS, &c)
-// 			switch ok {
-// 			case nil:
-// 				c.UpdateUndelegate(ORDOS, int(d.Reward.LastHeight))
-// 				c.UpdateClaimAndReward(
-// 					d.Address,
-// 					d.ValidatorAddress,
-// 					d.Reward,
-// 					ORDOS,
-// 				)
-// 				filter := bson.D{{Key: "address", Value: utils.MakeKey(d.Address)}}
-// 				update := bson.D{{Key: "$set", Value: bson.D{{Key: "ordos", Value: c}}}}
-// 				db.UpdateOne(filter, update)
-
-// 			case mongo.ErrNoDocuments:
-// 				account := account.Account{}
-// 				account.SetAccount(d.Address, d.ValidatorAddress, d.Reward, ORDOS)
-// 				db.Insert(account)
-// 			}
-// 		}
-// 	}
-// }
