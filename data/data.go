@@ -49,7 +49,7 @@ func MakeTotal(wg *sync.WaitGroup) {
 
 	for {
 		time.Sleep(time.Second * 60)
-		fmt.Println("Total!")
+		fmt.Println("===========Total!================")
 		accountList, err := db.FindAll()
 		if err != nil || len(accountList) == 0 {
 			fmt.Println("Make Total None")
@@ -166,11 +166,11 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					switch chainCode {
 					case 0:
 						o := a.Atreides.Rewards[delegation.ValidatorAddress]
+
 						if o.UAtr > reward.UAtr {
 							//Tax 제외
-
 							if (reward.UAtr/o.UAtr)*100 != 0 {
-								fmt.Println("Claim!")
+								fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 								// utils.PrettyJson(o)
 								// utils.PrettyJson(resReward)
 								claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
@@ -229,7 +229,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						o := a.Harkonnen.Rewards[delegation.ValidatorAddress]
 						if o.UHar > reward.UHar {
 							if (reward.UHar/o.UHar)*100 != 0 {
-								fmt.Println("Claim!")
+								fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 								// utils.PrettyJson(o)
 								// utils.PrettyJson(resReward)
 								claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
@@ -286,7 +286,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						o := a.Corrino.Rewards[delegation.ValidatorAddress]
 						if o.UCor > reward.UCor {
 							if (reward.UCor/o.UCor)*100 != 0 {
-								fmt.Println("Claim!")
+								fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 								// utils.PrettyJson(o)
 								// utils.PrettyJson(resReward)
 								claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
@@ -343,7 +343,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						o := a.Ordos.Rewards[delegation.ValidatorAddress]
 						if o.UOrd > reward.UOrd {
 							if (reward.UOrd/o.UOrd)*100 != 0 {
-								fmt.Println("Claim!")
+								fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 								// utils.PrettyJson(o)
 								// utils.PrettyJson(resReward)
 								claimOrd := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd

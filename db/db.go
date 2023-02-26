@@ -67,12 +67,12 @@ func Insert(account account.Account) error {
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
 	collection := d.db.Database(d.dbName).Collection(d.collection)
-	insertResult, err := collection.InsertOne(ctx, account)
+	_, err := collection.InsertOne(ctx, account)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Insert Complete", insertResult.InsertedID)
+	// fmt.Println("Insert Complete", insertResult.InsertedID)
 	return nil
 }
 
