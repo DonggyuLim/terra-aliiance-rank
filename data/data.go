@@ -86,7 +86,6 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			time.Sleep(time.Minute * 1)
 			continue
 		}
-
 		delegationsData, err := GetDelegations(height, chainCode)
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
@@ -111,7 +110,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					delegation.Denom,
 				)
 				if err != nil || len(resReward) == 0 {
-					fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
+					// fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
 					height += 1
 					WriteHeight(chainCode, height)
 					return err
@@ -172,8 +171,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 							if (reward.UAtr/o.UAtr)*100 != 0 {
 								fmt.Println("Claim!")
-								utils.PrettyJson(o)
-								utils.PrettyJson(resReward)
+								// utils.PrettyJson(o)
+								// utils.PrettyJson(resReward)
 								claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
 								claimSCOR := (o.SCOR - reward.SCOR) + a.Atreides.Claim.SCOR
 								claimSORD := (o.SORD - reward.SORD) + a.Atreides.Claim.SORD
@@ -231,8 +230,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						if o.UHar > reward.UHar {
 							if (reward.UHar/o.UHar)*100 != 0 {
 								fmt.Println("Claim!")
-								utils.PrettyJson(o)
-								utils.PrettyJson(resReward)
+								// utils.PrettyJson(o)
+								// utils.PrettyJson(resReward)
 								claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
 								claimSCOR := (o.SCOR - reward.SCOR) + a.Harkonnen.Claim.SCOR
 								claimSORD := (o.SORD - reward.SORD) + a.Harkonnen.Claim.SORD
@@ -288,8 +287,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						if o.UCor > reward.UCor {
 							if (reward.UCor/o.UCor)*100 != 0 {
 								fmt.Println("Claim!")
-								utils.PrettyJson(o)
-								utils.PrettyJson(resReward)
+								// utils.PrettyJson(o)
+								// utils.PrettyJson(resReward)
 								claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
 								claimSCOR := (o.SCOR - reward.SCOR) + a.Corrino.Claim.SCOR
 								claimSORD := (o.SORD - reward.SORD) + a.Corrino.Claim.SORD
@@ -345,8 +344,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						if o.UOrd > reward.UOrd {
 							if (reward.UOrd/o.UOrd)*100 != 0 {
 								fmt.Println("Claim!")
-								utils.PrettyJson(o)
-								utils.PrettyJson(resReward)
+								// utils.PrettyJson(o)
+								// utils.PrettyJson(resReward)
 								claimOrd := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
 								claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
 								claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
