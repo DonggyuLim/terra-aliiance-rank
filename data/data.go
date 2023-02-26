@@ -269,19 +269,18 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								{
 									Key: "$set", Value: bson.D{
 										{Key: "corrino.claim", Value: bson.D{
-											{Key: fmt.Sprintf("corrino.claim.%s.ucor", delegation.ValidatorAddress), Value: claimCor + a.Corrino.Claim.UCor},
-											{Key: fmt.Sprintf("corrino.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
-											{Key: fmt.Sprintf("corrino.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
-										},
-										},
-
-										{Key: "corrino.rewards", Value: bson.D{
-											{Key: fmt.Sprintf("corrino.rewards.%s.ucor", delegation.ValidatorAddress), Value: reward.UHar},
-											{Key: fmt.Sprintf("corrino.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
-											{Key: fmt.Sprintf("corrino.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
+											{Key: "ucor", Value: claimCor + a.Corrino.Claim.UCor},
+											{Key: "scor", Value: claimSCOR},
+											{Key: "sord", Value: claimSORD},
 										},
 										},
 									},
+								},
+								{Key: "$set", Value: bson.D{
+									{Key: fmt.Sprintf("corrino.rewards.%s.ucor", delegation.ValidatorAddress), Value: reward.UCor},
+									{Key: fmt.Sprintf("corrino.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
+									{Key: fmt.Sprintf("corrino.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
+								},
 								},
 							}
 							db.UpdateOne(filter, claimUpdate)
@@ -315,17 +314,18 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								{
 									Key: "$set", Value: bson.D{
 										{Key: "ordos.claim", Value: bson.D{
-											{Key: fmt.Sprintf("ordos.claim.%s.uord", delegation.ValidatorAddress), Value: claimOrd + a.Ordos.Claim.UOrd},
-											{Key: fmt.Sprintf("ordos.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
-											{Key: fmt.Sprintf("ordos.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
+											{Key: "ucor", Value: claimOrd + a.Corrino.Claim.UOrd},
+											{Key: "scor", Value: claimSCOR},
+											{Key: "sord", Value: claimSORD},
 										},
 										},
-										{Key: "ordos.rewards", Value: bson.D{
-											{Key: fmt.Sprintf("ordos.rewards.%s.uord", delegation.ValidatorAddress), Value: reward.UOrd},
-											{Key: fmt.Sprintf("ordos.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
-											{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
-										},
-										},
+									},
+								},
+								{
+									Key: "$set", Value: bson.D{
+										{Key: fmt.Sprintf("ordos.rewards.%s.uord", delegation.ValidatorAddress), Value: reward.UOrd},
+										{Key: fmt.Sprintf("ordos.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
+										{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 									},
 								},
 							}
