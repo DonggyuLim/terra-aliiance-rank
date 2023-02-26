@@ -39,7 +39,7 @@ func Main(wg *sync.WaitGroup) {
 	go MakeReward(w, ATREIDES)
 	go MakeReward(w, Harkonnen)
 	go MakeReward(w, CORRINO)
-	go MakeReward(w, ORDOS)
+	// go MakeReward(w, ORDOS)
 	go MakeTotal(w)
 	wg.Wait()
 }
@@ -90,7 +90,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		delegationsData, err := GetDelegations(height, chainCode)
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
-			// fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
+			fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
 			height += 1
 			WriteHeight(chainCode, height)
 			continue
@@ -111,7 +111,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					delegation.Denom,
 				)
 				if err != nil || len(resReward) == 0 {
-					// fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
+					fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
 					height += 1
 					WriteHeight(chainCode, height)
 					return err
