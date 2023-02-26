@@ -164,7 +164,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					switch chainCode {
 					case 0:
 						o := a.Atreides.Rewards[delegation.ValidatorAddress]
-						claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
+						claimAtr := (o.UAtr - reward.UAtr)
 
 						if o.UAtr > reward.UAtr && (percent.PercentOf(claimAtr, o.UAtr) >= 10) {
 							//Tax 제외
@@ -177,7 +177,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								{
 									Key: "$set", Value: bson.D{
 										{Key: "atreides.claim", Value: bson.D{
-											{Key: "uatr", Value: claimAtr},
+											{Key: "uatr", Value: claimAtr + a.Atreides.Claim.UAtr},
 											{Key: "scor", Value: claimSCOR},
 											{Key: "sord", Value: claimSORD},
 										},
@@ -211,10 +211,10 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 					case 1:
 						o := a.Harkonnen.Rewards[delegation.ValidatorAddress]
-						claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
+						claimhar := (o.UHar - reward.UHar)
 						if o.UHar > reward.UHar && (percent.PercentOf(claimhar, o.UHar) >= 10) {
 
-							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
+							fmt.Printf("Claim! chain: %v height: %v account: %v \n", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
 							// utils.PrettyJson(resReward)
 
@@ -224,7 +224,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								{
 									Key: "$set", Value: bson.D{
 										{Key: "harkonnen.claim", Value: bson.D{
-											{Key: fmt.Sprintf("harkonnen.claim.%s.uhar", delegation.ValidatorAddress), Value: claimhar},
+											{Key: fmt.Sprintf("harkonnen.claim.%s.uhar", delegation.ValidatorAddress), Value: claimhar + a.Harkonnen.Claim.UHar},
 											{Key: fmt.Sprintf("harkonnen.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
 											{Key: fmt.Sprintf("harkonnen.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
 										},
@@ -257,7 +257,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					case 2:
 
 						o := a.Corrino.Rewards[delegation.ValidatorAddress]
-						claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
+						claimCor := (o.UCor - reward.UCor)
 						if o.UCor > reward.UCor && (percent.PercentOf(claimCor, o.UCor) >= 10) {
 
 							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
@@ -269,7 +269,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								{
 									Key: "$set", Value: bson.D{
 										{Key: "corrino.claim", Value: bson.D{
-											{Key: fmt.Sprintf("corrino.claim.%s.ucor", delegation.ValidatorAddress), Value: claimCor},
+											{Key: fmt.Sprintf("corrino.claim.%s.ucor", delegation.ValidatorAddress), Value: claimCor + a.Corrino.Claim.UCor},
 											{Key: fmt.Sprintf("corrino.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
 											{Key: fmt.Sprintf("corrino.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
 										},
@@ -302,7 +302,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 					case 3:
 						o := a.Ordos.Rewards[delegation.ValidatorAddress]
-						claimOrd := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
+						claimOrd := (o.UOrd - reward.UOrd)
 						if o.UOrd > reward.UOrd && (percent.PercentOf(claimOrd, o.UOrd) >= 10) {
 
 							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
@@ -314,7 +314,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								{
 									Key: "$set", Value: bson.D{
 										{Key: "ordos.claim", Value: bson.D{
-											{Key: fmt.Sprintf("ordos.claim.%s.uord", delegation.ValidatorAddress), Value: claimOrd},
+											{Key: fmt.Sprintf("ordos.claim.%s.uord", delegation.ValidatorAddress), Value: claimOrd + a.Ordos.Claim.UOrd},
 											{Key: fmt.Sprintf("ordos.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
 											{Key: fmt.Sprintf("ordos.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
 										},
