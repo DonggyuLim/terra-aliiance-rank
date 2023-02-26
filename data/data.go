@@ -39,7 +39,7 @@ func Main(wg *sync.WaitGroup) {
 	go MakeReward(w, ATREIDES)
 	go MakeReward(w, Harkonnen)
 	go MakeReward(w, CORRINO)
-	go MakeReward(w, ORDOS)
+	// go MakeReward(w, ORDOS)
 	go MakeTotal(w)
 	wg.Wait()
 }
@@ -82,7 +82,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 		lastBlock := GetLastBlock(chainCode)
 		if height > lastBlock {
-			fmt.Println("height > lastblock")
+			fmt.Printf("height : %v lastblock:%v time lock\n", height, lastBlock)
 			time.Sleep(time.Minute * 1)
 			continue
 		}
@@ -90,7 +90,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		delegationsData, err := GetDelegations(height, chainCode)
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
-			fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
+			// fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
 			height += 1
 			WriteHeight(chainCode, height)
 			continue
@@ -111,7 +111,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					delegation.Denom,
 				)
 				if err != nil || len(resReward) == 0 {
-					fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
+					// fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
 					height += 1
 					WriteHeight(chainCode, height)
 					return err
@@ -158,7 +158,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					}
 				}
 				filter := bson.D{
-					{Key: "address", Value: utils.MakeAddress(delegation.DelegatorAddress)},
+					{Key: "address", Value: utils.MakeKey(delegation.DelegatorAddress)},
 				}
 				a, ok := db.FindOne(filter)
 
@@ -400,7 +400,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					}
 				case mongo.ErrNoDocuments:
 					fmt.Println("New Account!")
-					key := utils.MakeAddress(delegation.DelegatorAddress)
+					key := utils.MakeKey(delegation.DelegatorAddress)
 					a.SetAccount(key, delegation.ValidatorAddress, reward, chainCode)
 					db.Insert(a)
 				}
@@ -433,7 +433,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 // 					ATREIDES,
 // 				)
 // 				c.UpdateUndelegate(0, int(d.Reward.LastHeight))
-// 				filter := bson.D{{Key: "address", Value: utils.MakeAddress(d.Address)}}
+// 				filter := bson.D{{Key: "address", Value: utils.MakeKey(d.Address)}}
 // 				update := bson.D{{Key: "$set", Value: bson.D{{Key: "atreides", Value: c}}}}
 // 				db.UpdateOne(filter, update)
 
@@ -456,7 +456,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 // 					d.Reward,
 // 					Harkonnen,
 // 				)
-// 				filter := bson.D{{Key: "address", Value: utils.MakeAddress(d.Address)}}
+// 				filter := bson.D{{Key: "address", Value: utils.MakeKey(d.Address)}}
 // 				update := bson.D{{Key: "$set", Value: bson.D{{Key: "harkonnen", Value: c}}}}
 // 				db.UpdateOne(filter, update)
 
@@ -479,7 +479,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 // 					d.Reward,
 // 					CORRINO,
 // 				)
-// 				filter := bson.D{{Key: "address", Value: utils.MakeAddress(d.Address)}}
+// 				filter := bson.D{{Key: "address", Value: utils.MakeKey(d.Address)}}
 // 				update := bson.D{{Key: "$set", Value: bson.D{{Key: "corrino", Value: c}}}}
 // 				db.UpdateOne(filter, update)
 
@@ -502,7 +502,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 // 					d.Reward,
 // 					ORDOS,
 // 				)
-// 				filter := bson.D{{Key: "address", Value: utils.MakeAddress(d.Address)}}
+// 				filter := bson.D{{Key: "address", Value: utils.MakeKey(d.Address)}}
 // 				update := bson.D{{Key: "$set", Value: bson.D{{Key: "ordos", Value: c}}}}
 // 				db.UpdateOne(filter, update)
 

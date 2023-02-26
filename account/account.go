@@ -72,18 +72,20 @@ func (a *Account) SetAccount(address, validator string, reward Reward, chainCode
 	a.Harkonnen.Rewards = m2
 	a.Corrino.Rewards = m3
 	a.Ordos.Rewards = m4
+
+	a.Atreides.Address = utils.MakeAddressPrefix(address, "atreides")
+	a.Harkonnen.Address = utils.MakeAddressPrefix(address, "harkonnen")
+	a.Corrino.Address = utils.MakeAddressPrefix(address, "corrino")
+	a.Ordos.Address = utils.MakeAddressPrefix(address, "ordos")
+
 	switch chainCode {
 	case 0:
-		a.Atreides.Address = address
 		a.Atreides.Rewards[validator] = reward
 	case 1:
-		a.Harkonnen.Address = address
 		a.Harkonnen.Rewards[validator] = reward
 	case 2:
-		a.Corrino.Address = address
 		a.Corrino.Rewards[validator] = reward
 	case 3:
-		a.Ordos.Address = address
 		a.Ordos.Rewards[validator] = reward
 	}
 }

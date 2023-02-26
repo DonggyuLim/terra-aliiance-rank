@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/DonggyuLim/Alliance-Rank/db"
+	"github.com/DonggyuLim/Alliance-Rank/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -198,12 +199,11 @@ type MyRewardResponse struct {
 }
 
 func UserReward(c *gin.Context) {
-	// address := c.Query("address")
-	address := c.Param("address")
-	// address := "atreides1qqczsqkqh4nnrxz3xwcfzydfman9nsltnujta4"
-	fmt.Println(address)
 
-	filter := bson.D{{Key: "address", Value: address}}
+	address := c.Param("address")
+
+	key := utils.MakeKey(address)
+	filter := bson.D{{Key: "address", Value: key}}
 
 	a, ok := db.FindOne(filter)
 	switch ok {

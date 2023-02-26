@@ -22,12 +22,12 @@ func accountEncode(prefix string, account []byte) (address string) {
 	return encoded
 }
 
-func MakeAddress(account string) string {
+func MakeKey(account string) string {
 	bytes := accountDecode(account)
 	return accountEncode("atreides", bytes)
 }
 
-func MakeAddress2(account, prefix string) string {
+func MakeAddressPrefix(account, prefix string) string {
 	bytes := accountDecode(account)
 	return accountEncode(prefix, bytes)
 }

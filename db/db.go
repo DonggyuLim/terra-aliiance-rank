@@ -233,7 +233,7 @@ func FindChain(address string, chainCode int, c *account.Reward) error {
 		projection = bson.D{{Key: "ordos", Value: 1}}
 	}
 
-	filter := bson.D{{Key: "address", Value: utils.MakeAddress(address)}}
+	filter := bson.D{{Key: "address", Value: utils.MakeKey(address)}}
 	opts := options.FindOne().SetProjection(projection)
 	err := collection.FindOne(ctx, filter, opts).Decode(c)
 	if err != nil {

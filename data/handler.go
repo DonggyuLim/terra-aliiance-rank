@@ -44,13 +44,13 @@ func GetRewards(chainCode, height int, delegator, validator, denom string) ([]re
 func GetAddress(chainCode int, address string) string {
 	switch chainCode {
 	case 0:
-		return utils.MakeAddress2(address, "atreides")
+		return utils.MakeAddressPrefix(address, "atreides")
 	case 1:
-		return utils.MakeAddress2(address, "harkonnen")
+		return utils.MakeAddressPrefix(address, "harkonnen")
 	case 2:
-		return utils.MakeAddress2(address, "corrino")
+		return utils.MakeAddressPrefix(address, "corrino")
 	case 3:
-		return utils.MakeAddress2(address, "ordos")
+		return utils.MakeAddressPrefix(address, "ordos")
 	}
 	return ""
 }
