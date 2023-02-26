@@ -11,6 +11,7 @@ import (
 	"github.com/DonggyuLim/Alliance-Rank/account"
 	"github.com/DonggyuLim/Alliance-Rank/db"
 	"github.com/DonggyuLim/Alliance-Rank/utils"
+	"github.com/dariubs/percent"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -165,7 +166,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						o := a.Atreides.Rewards[delegation.ValidatorAddress]
 						claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
 
-						if o.UAtr > reward.UAtr && ((claimAtr / o.UHar * 100) >= 10) {
+						if o.UAtr > reward.UAtr && (percent.PercentOf(claimAtr, o.UAtr) >= 10) {
 							//Tax 제외
 							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
@@ -211,7 +212,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					case 1:
 						o := a.Harkonnen.Rewards[delegation.ValidatorAddress]
 						claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
-						if o.UHar > reward.UHar && ((claimhar / o.UHar * 100) >= 10) {
+						if o.UHar > reward.UHar && (percent.PercentOf(claimhar, o.UHar) >= 10) {
 
 							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
@@ -257,7 +258,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 						o := a.Corrino.Rewards[delegation.ValidatorAddress]
 						claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
-						if o.UCor > reward.UCor && ((claimCor / o.UHar * 100) >= 10) {
+						if o.UCor > reward.UCor && (percent.PercentOf(claimCor, o.UCor) >= 10) {
 
 							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
@@ -302,7 +303,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					case 3:
 						o := a.Ordos.Rewards[delegation.ValidatorAddress]
 						claimOrd := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
-						if o.UOrd > reward.UOrd && ((claimOrd / o.UHar * 100) >= 10) {
+						if o.UOrd > reward.UOrd && (percent.PercentOf(claimOrd, o.UOrd) >= 10) {
 
 							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
