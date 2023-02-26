@@ -163,52 +163,38 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					switch chainCode {
 					case 0:
 						o := a.Atreides.Rewards[delegation.ValidatorAddress]
+						claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
 
-						if o.UAtr > reward.UAtr {
+						if o.UAtr > reward.UAtr && ((claimAtr / o.UHar * 100) >= 10) {
 							//Tax 제외
-							if (reward.UAtr/o.UAtr)*100 != 0 {
-								fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
-								// utils.PrettyJson(o)
-								// utils.PrettyJson(resReward)
-								claimAtr := (o.UAtr - reward.UAtr) + a.Atreides.Claim.UAtr
-								claimSCOR := (o.SCOR - reward.SCOR) + a.Atreides.Claim.SCOR
-								claimSORD := (o.SORD - reward.SORD) + a.Atreides.Claim.SORD
-								claimUpdate := bson.D{
-									{
-										Key: "$set", Value: bson.D{
-											{Key: "atreides.claim", Value: bson.D{
-												{Key: "uatr", Value: claimAtr},
-												{Key: "scor", Value: claimSCOR},
-												{Key: "sord", Value: claimSORD},
-											},
-											},
+							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
+							// utils.PrettyJson(o)
+							// utils.PrettyJson(resReward)
+							claimSCOR := (o.SCOR - reward.SCOR) + a.Atreides.Claim.SCOR
+							claimSORD := (o.SORD - reward.SORD) + a.Atreides.Claim.SORD
+							claimUpdate := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "atreides.claim", Value: bson.D{
+											{Key: "uatr", Value: claimAtr},
+											{Key: "scor", Value: claimSCOR},
+											{Key: "sord", Value: claimSORD},
+										},
 										},
 									},
-									{
-										Key: "$set", Value: bson.D{
-											{Key: fmt.Sprintf("atreides.rewards.%s.uatr", delegation.ValidatorAddress), Value: reward.UAtr},
-											{Key: fmt.Sprintf("atreides.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
-											{Key: fmt.Sprintf("atreides.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
-										},
+								},
+								{
+									Key: "$set", Value: bson.D{
+										{Key: fmt.Sprintf("atreides.rewards.%s.uatr", delegation.ValidatorAddress), Value: reward.UAtr},
+										{Key: fmt.Sprintf("atreides.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
+										{Key: fmt.Sprintf("atreides.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 									},
-								}
-								db.UpdateOne(filter, claimUpdate)
-							} else {
-
-								update := bson.D{
-									{
-										Key: "$set", Value: bson.D{
-											{Key: fmt.Sprintf("atreides.rewards.%s.uatr", delegation.ValidatorAddress), Value: reward.UAtr},
-											{Key: fmt.Sprintf("atreides.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
-											{Key: fmt.Sprintf("atreides.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
-										},
-									},
-								}
-
-								db.UpdateOne(filter, update)
+								},
 							}
+							db.UpdateOne(filter, claimUpdate)
 
 						} else {
+							fmt.Printf("Reward Update!! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 							update := bson.D{
 								{
 									Key: "$set", Value: bson.D{
@@ -224,48 +210,37 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 					case 1:
 						o := a.Harkonnen.Rewards[delegation.ValidatorAddress]
-						if o.UHar > reward.UHar {
-							if (reward.UHar/o.UHar)*100 != 0 {
-								fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
-								// utils.PrettyJson(o)
-								// utils.PrettyJson(resReward)
-								claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
-								claimSCOR := (o.SCOR - reward.SCOR) + a.Harkonnen.Claim.SCOR
-								claimSORD := (o.SORD - reward.SORD) + a.Harkonnen.Claim.SORD
-								claimUpdate := bson.D{
-									{
-										Key: "$set", Value: bson.D{
-											{Key: "harkonnen.claim", Value: bson.D{
-												{Key: fmt.Sprintf("harkonnen.claim.%s.uhar", delegation.ValidatorAddress), Value: claimhar},
-												{Key: fmt.Sprintf("harkonnen.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
-												{Key: fmt.Sprintf("harkonnen.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
-											},
-											},
-										},
-									},
-									{Key: "$set", Value: bson.D{
-										{Key: fmt.Sprintf("harkonnen.rewards.%s.uhar", delegation.ValidatorAddress), Value: reward.UHar},
-										{Key: fmt.Sprintf("harkonnen.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
-										{Key: fmt.Sprintf("harkonnen.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
-									},
-									},
-								}
-								db.UpdateOne(filter, claimUpdate)
-							} else {
+						claimhar := (o.UHar - reward.UHar) + a.Harkonnen.Claim.UHar
+						if o.UHar > reward.UHar && ((claimhar / o.UHar * 100) >= 10) {
 
-								update := bson.D{
-									{
-										Key: "$set", Value: bson.D{
-											{Key: fmt.Sprintf("harkonnen.rewards.%s.uhar", delegation.ValidatorAddress), Value: reward.UHar},
-											{Key: fmt.Sprintf("harkonnen.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
-											{Key: fmt.Sprintf("harkonnen.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
+							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
+							// utils.PrettyJson(o)
+							// utils.PrettyJson(resReward)
+
+							claimSCOR := (o.SCOR - reward.SCOR) + a.Harkonnen.Claim.SCOR
+							claimSORD := (o.SORD - reward.SORD) + a.Harkonnen.Claim.SORD
+							claimUpdate := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "harkonnen.claim", Value: bson.D{
+											{Key: fmt.Sprintf("harkonnen.claim.%s.uhar", delegation.ValidatorAddress), Value: claimhar},
+											{Key: fmt.Sprintf("harkonnen.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
+											{Key: fmt.Sprintf("harkonnen.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
+										},
 										},
 									},
-								}
-								db.UpdateOne(filter, update)
+								},
+								{Key: "$set", Value: bson.D{
+									{Key: fmt.Sprintf("harkonnen.rewards.%s.uhar", delegation.ValidatorAddress), Value: reward.UHar},
+									{Key: fmt.Sprintf("harkonnen.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
+									{Key: fmt.Sprintf("harkonnen.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
+								},
+								},
 							}
+							db.UpdateOne(filter, claimUpdate)
 
 						} else {
+							fmt.Printf("Reward Update!! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 							update := bson.D{
 								{
 									Key: "$set", Value: bson.D{
@@ -281,49 +256,37 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					case 2:
 
 						o := a.Corrino.Rewards[delegation.ValidatorAddress]
-						if o.UCor > reward.UCor {
-							if (reward.UCor/o.UCor)*100 != 0 {
-								fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
-								// utils.PrettyJson(o)
-								// utils.PrettyJson(resReward)
-								claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
-								claimSCOR := (o.SCOR - reward.SCOR) + a.Corrino.Claim.SCOR
-								claimSORD := (o.SORD - reward.SORD) + a.Corrino.Claim.SORD
-								claimUpdate := bson.D{
-									{
-										Key: "$set", Value: bson.D{
-											{Key: "corrino.claim", Value: bson.D{
-												{Key: fmt.Sprintf("corrino.claim.%s.uhar", delegation.ValidatorAddress), Value: claimCor},
-												{Key: fmt.Sprintf("corrino.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
-												{Key: fmt.Sprintf("corrino.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
-											},
-											},
+						claimCor := (o.UCor - reward.UCor) + a.Corrino.Claim.UCor
+						if o.UCor > reward.UCor && ((claimCor / o.UHar * 100) >= 10) {
 
-											{Key: "$corrino.rewards", Value: bson.D{
-												{Key: fmt.Sprintf("corrino.rewards.%s.uhar", delegation.ValidatorAddress), Value: reward.UHar},
-												{Key: fmt.Sprintf("corrino.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
-												{Key: fmt.Sprintf("corrino.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
-											},
-											},
+							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
+							// utils.PrettyJson(o)
+							// utils.PrettyJson(resReward)
+							claimSCOR := (o.SCOR - reward.SCOR) + a.Corrino.Claim.SCOR
+							claimSORD := (o.SORD - reward.SORD) + a.Corrino.Claim.SORD
+							claimUpdate := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "corrino.claim", Value: bson.D{
+											{Key: fmt.Sprintf("corrino.claim.%s.uhar", delegation.ValidatorAddress), Value: claimCor},
+											{Key: fmt.Sprintf("corrino.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
+											{Key: fmt.Sprintf("corrino.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
 										},
-									},
-								}
-								db.UpdateOne(filter, claimUpdate)
-							} else {
+										},
 
-								update := bson.D{
-									{
-										Key: "$set", Value: bson.D{
-											{Key: fmt.Sprintf("corrino.rewards.%s.ucor", delegation.ValidatorAddress), Value: reward.UCor},
+										{Key: "$corrino.rewards", Value: bson.D{
+											{Key: fmt.Sprintf("corrino.rewards.%s.uhar", delegation.ValidatorAddress), Value: reward.UHar},
 											{Key: fmt.Sprintf("corrino.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 											{Key: fmt.Sprintf("corrino.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										},
+										},
 									},
-								}
-								db.UpdateOne(filter, update)
+								},
 							}
+							db.UpdateOne(filter, claimUpdate)
 
 						} else {
+							fmt.Printf("Reward Update!! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 							update := bson.D{
 								{
 									Key: "$set", Value: bson.D{
@@ -338,49 +301,37 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 					case 3:
 						o := a.Ordos.Rewards[delegation.ValidatorAddress]
-						if o.UOrd > reward.UOrd {
-							if (reward.UOrd/o.UOrd)*100 != 0 {
-								fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
-								// utils.PrettyJson(o)
-								// utils.PrettyJson(resReward)
-								claimOrd := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
-								claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
-								claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
-								claimUpdate := bson.D{
-									{
-										Key: "$set", Value: bson.D{
-											{Key: "ordos.claim", Value: bson.D{
-												{Key: fmt.Sprintf("ordos.claim.%s.uord", delegation.ValidatorAddress), Value: claimOrd},
-												{Key: fmt.Sprintf("ordos.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
-												{Key: fmt.Sprintf("ordos.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
-											},
-											},
-											{Key: "ordos.rewards", Value: bson.D{
-												{Key: fmt.Sprintf("ordos.rewards.%s.uord", delegation.ValidatorAddress), Value: reward.UOrd},
-												{Key: fmt.Sprintf("ordos.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
-												{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
-											},
-											},
+						claimOrd := (o.UOrd - reward.UOrd) + a.Ordos.Claim.UOrd
+						if o.UOrd > reward.UOrd && ((claimOrd / o.UHar * 100) >= 10) {
+
+							fmt.Printf("Claim! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
+							// utils.PrettyJson(o)
+							// utils.PrettyJson(resReward)
+							claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
+							claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
+							claimUpdate := bson.D{
+								{
+									Key: "$set", Value: bson.D{
+										{Key: "ordos.claim", Value: bson.D{
+											{Key: fmt.Sprintf("ordos.claim.%s.uord", delegation.ValidatorAddress), Value: claimOrd},
+											{Key: fmt.Sprintf("ordos.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
+											{Key: fmt.Sprintf("ordos.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
 										},
-									},
-								}
-
-								db.UpdateOne(filter, claimUpdate)
-							} else {
-
-								update := bson.D{
-									{
-										Key: "$set", Value: bson.D{
+										},
+										{Key: "ordos.rewards", Value: bson.D{
 											{Key: fmt.Sprintf("ordos.rewards.%s.uord", delegation.ValidatorAddress), Value: reward.UOrd},
 											{Key: fmt.Sprintf("ordos.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 											{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										},
+										},
 									},
-								}
-
-								db.UpdateOne(filter, update)
+								},
 							}
+
+							db.UpdateOne(filter, claimUpdate)
+
 						} else {
+							fmt.Printf("Reward Update!! chain : %v height :%v account :%v ", chainCode, height, delegation.DelegatorAddress)
 							update := bson.D{
 								{
 									Key: "$set", Value: bson.D{
