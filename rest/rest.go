@@ -4,6 +4,8 @@ import (
 	"sync"
 	"time"
 
+	cache "github.com/chenyahui/gin-cache"
+	"github.com/chenyahui/gin-cache/persist"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +22,9 @@ func Start(wg *sync.WaitGroup) {
 		AllowMethods: []string{"GET"},
 		MaxAge:       12 * time.Hour,
 	}))
+	r.Use(gin.Recovery())
+	memoryStore := persist.NewMemoryStore(1 * time.Minute)
+	r.Use(cache.CacheByRequestPath(memoryStore, 10*time.Second))
 
 	r.GET("/", Root)
 	r.GET("/uatr", UatrRank)
