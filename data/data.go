@@ -60,6 +60,7 @@ func DeleteCorrinoAndOrdos() {
 		a.Corrino = corrino
 		a.Corrino.Claim = account.Claim{}
 		a.Total.UCor = 0
+
 		m2 := make(map[string]account.Reward)
 		ordos := account.Chain{
 			Address: a.Ordos.Address,
@@ -68,7 +69,7 @@ func DeleteCorrinoAndOrdos() {
 		a.Ordos = ordos
 		a.Ordos.Claim = account.Claim{}
 		a.Total.UOrd = 0
-
+		a.Total.Total = 0
 		filter := bson.D{{Key: "address", Value: a.Address}}
 
 		db.ReplaceOne(filter, a)
