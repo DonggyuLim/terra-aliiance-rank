@@ -98,7 +98,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			WriteHeight(chainCode, height)
 			continue
 		}
-		fmt.Printf("chain: %v  height: %v delecount: %v  lastblock:%v  Start!\n", chainCode, height, len(delegations), lastBlock)
+		fmt.Printf("chain: %v  height: %v delecount: %v  Start!\n", chainCode, height, len(delegations))
 		g, _ := errgroup.WithContext(context.Background())
 		for i := 0; i <= len(delegations)-1; i++ {
 			delegation := delegations[i].Delegation
