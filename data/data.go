@@ -112,7 +112,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					delegation.Denom,
 				)
 				if err != nil || len(resReward) == 0 {
-					// fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
+					fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
 					return err
 				}
 
