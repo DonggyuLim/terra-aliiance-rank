@@ -195,7 +195,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							db.UpdateOne(filter, claimUpdate)
 
 						} else {
-							fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
+							// fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
 							update := bson.D{
 								{
 									Key: "$set", Value: bson.D{
@@ -240,7 +240,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							db.UpdateOne(filter, claimUpdate)
 
 						} else {
-							fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
+							// fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
 							update := bson.D{
 								{
 									Key: "$set", Value: bson.D{
