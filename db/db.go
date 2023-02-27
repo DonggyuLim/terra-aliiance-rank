@@ -55,14 +55,12 @@ func Close() {
 	fmt.Println("=========Connection to MongoDB closed=============")
 }
 func GetCollection() *mongo.Collection {
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
+
 	return db.client.Database(db.dbName).Collection(db.collection)
 }
 
 func Insert(account account.Account) error {
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
+
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
@@ -77,8 +75,7 @@ func Insert(account account.Account) error {
 }
 
 func InsertMany(data []account.Account) {
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
+
 	var a []interface{}
 	for _, el := range data {
 		a = append(a, el)
@@ -97,8 +94,7 @@ func InsertMany(data []account.Account) {
 }
 
 func FindOne(filter bson.D) (account.Account, error) {
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
+
 	a := account.Account{}
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
@@ -117,8 +113,7 @@ func FindOne(filter bson.D) (account.Account, error) {
 }
 
 func Find(key, value, desc string, limit int64) ([]account.Account, error) {
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
+
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
@@ -141,8 +136,7 @@ func Find(key, value, desc string, limit int64) ([]account.Account, error) {
 }
 
 func FindAll() ([]account.Account, error) {
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
+
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
@@ -184,8 +178,6 @@ func ReplaceOne(filter bson.D, account account.Account) {
 }
 
 func UpdateOne(filter, update bson.D) {
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
 
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
@@ -198,8 +190,7 @@ func UpdateOne(filter, update bson.D) {
 }
 
 func UpdateOneMap(filter bson.D, update bson.M) {
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
+
 	exp := 10 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
@@ -210,8 +201,7 @@ func UpdateOneMap(filter bson.D, update bson.M) {
 }
 
 func FindChain(address string, chainCode int, c *account.Reward) error {
-	db.Mutex.Lock()
-	defer db.Mutex.Unlock()
+
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()

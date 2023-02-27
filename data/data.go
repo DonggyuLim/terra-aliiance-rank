@@ -98,7 +98,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		} else {
 			fmt.Printf("chain: %v  height: %v delecount: %v  lastblock:%v \n", chainCode, height, len(delegations), lastBlock)
 		}
-		DB := db.ReturnDB()
+
 		g, _ := errgroup.WithContext(context.Background())
 		for i := 0; i <= len(delegations)-1; i++ {
 			delegation := delegations[i].Delegation
@@ -157,7 +157,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				filter := bson.D{
 					{Key: "address", Value: utils.MakeKey(delegation.DelegatorAddress)},
 				}
-				a, ok := DB.FindOne(filter)
+				a, ok := db.FindOne(filter)
 
 				switch ok {
 				case nil:
@@ -192,7 +192,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 									},
 								},
 							}
-							DB.UpdateOne(filter, claimUpdate)
+							db.UpdateOne(filter, claimUpdate)
 
 						} else {
 							fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
@@ -206,7 +206,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								},
 							}
 
-							DB.UpdateOne(filter, update)
+							db.UpdateOne(filter, update)
 						}
 
 					case 1:
@@ -237,7 +237,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 									},
 								},
 							}
-							DB.UpdateOne(filter, claimUpdate)
+							db.UpdateOne(filter, claimUpdate)
 
 						} else {
 							fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
@@ -250,7 +250,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 									},
 								},
 							}
-							DB.UpdateOne(filter, update)
+							db.UpdateOne(filter, update)
 						}
 
 					case 2:
@@ -282,7 +282,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								},
 								},
 							}
-							DB.UpdateOne(filter, claimUpdate)
+							db.UpdateOne(filter, claimUpdate)
 
 						} else {
 							fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
@@ -296,7 +296,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								},
 							}
 
-							DB.UpdateOne(filter, update)
+							db.UpdateOne(filter, update)
 						}
 					case 3:
 						o := a.Ordos.Rewards[delegation.ValidatorAddress]
@@ -329,7 +329,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								},
 							}
 
-							DB.UpdateOne(filter, claimUpdate)
+							db.UpdateOne(filter, claimUpdate)
 
 						} else {
 							fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
@@ -343,14 +343,14 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 								},
 							}
 
-							DB.UpdateOne(filter, update)
+							db.UpdateOne(filter, update)
 						}
 					}
 				case mongo.ErrNoDocuments:
 					fmt.Println("New Account!")
 					key := utils.MakeKey(delegation.DelegatorAddress)
 					a.SetAccount(key, delegation.ValidatorAddress, reward, chainCode)
-					DB.Insert(a)
+					db.Insert(a)
 				}
 				return nil
 			})
