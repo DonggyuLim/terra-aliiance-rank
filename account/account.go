@@ -31,6 +31,7 @@ type Reward struct {
 	UCor       int ` json:"ucor"`
 	SCOR       int ` json:"scor"`
 	SORD       int ` json:"sord"`
+	SHAR       int `json:"shar"`
 }
 
 type Claim struct {
@@ -40,6 +41,7 @@ type Claim struct {
 	UOrd int `json:"uord"`
 	SCOR int `json:"scor"`
 	SORD int `json:"sord"`
+	SHAR int `json:"shar"`
 }
 type Total struct {
 	UAtr  int ` json:"uatr"`
@@ -48,6 +50,7 @@ type Total struct {
 	UOrd  int ` json:"uord"`
 	SCOR  int ` json:"scor"`
 	SORD  int ` json:"sord"`
+	SHAR  int `json:"shar"`
 	Total int `json:"total"`
 }
 
@@ -58,6 +61,7 @@ type ChainTotal struct {
 	UOrd int `json:"uord"`
 	SCOR int `json:"scor"`
 	SORD int `json:"sord"`
+	SHAR int `json:"shar"`
 	// Total uint `json:"total"`
 }
 
@@ -218,56 +222,59 @@ func (a *Account) CalculateTotal() {
 		UOrd: 0,
 		SCOR: 0,
 		SORD: 0,
+		SHAR: 0,
 	}
 
 	for _, v := range a.Atreides.Rewards {
 		ct.UAtr += v.UAtr
 		ct.SCOR += v.SCOR
 		ct.SORD += v.SORD
+		ct.SHAR += v.SHAR
 	}
 	//claim reward +
 	ct.UAtr += a.Atreides.Claim.UAtr
 	ct.SCOR += a.Atreides.Claim.SCOR
 	ct.SORD += a.Atreides.Claim.SORD
+	ct.SHAR += a.Atreides.Claim.SHAR
 	a.Atreides.Total = ct
 
 	for _, v := range a.Harkonnen.Rewards {
 		ct.UHar += v.UHar
 		ct.SCOR += v.SCOR
 		ct.SORD += v.SORD
+		ct.SHAR += v.SHAR
 	}
 	//claim reward +
 	ct.UHar += a.Harkonnen.Claim.UHar
 	ct.SCOR += a.Harkonnen.Claim.SCOR
 	ct.SORD += a.Harkonnen.Claim.SORD
-
+	ct.SHAR += a.Harkonnen.Claim.SHAR
 	a.Harkonnen.Total = ct
 	// a.Total = a.Total+ a.Harkonnen.Total.NativeTotal)+ a.Harkonnen.Total.SCOR)+ a.Harkonnen.Total.SORD)
 	for _, v := range a.Corrino.Rewards {
 		ct.UCor += v.UCor
 		ct.SCOR += v.SCOR
 		ct.SORD += v.SORD
+		ct.SHAR += v.SHAR
 	}
 	//claim reward +
 	ct.UCor += a.Corrino.Claim.UCor
 	ct.SCOR += a.Corrino.Claim.SCOR
 	ct.SORD += a.Corrino.Claim.SORD
-
+	ct.SHAR += a.Corrino.Claim.SHAR
 	a.Corrino.Total = ct
 
 	for _, v := range a.Ordos.Rewards {
 		ct.UOrd += v.UOrd
-
 		ct.SCOR += v.SCOR
-
 		ct.SORD += v.SORD
-
+		ct.SHAR += v.SHAR
 	}
 	//claim reward +
 	ct.UOrd += a.Ordos.Claim.UOrd
 	ct.SCOR += a.Ordos.Claim.SCOR
 	ct.SORD += a.Ordos.Claim.SORD
-
+	ct.SHAR += a.Ordos.Claim.SHAR
 	a.Ordos.Total = ct
 
 	// a.Total = a.Total+ a.Ordos.Total.NativeTotal)+ a.Ordos.Total.SCOR)+ a.Ordos.Total.SORD)
@@ -279,11 +286,13 @@ func (a *Account) CalculateTotal() {
 	a.Total.UHar = a.Harkonnen.Total.UHar
 	a.Total.UCor = a.Corrino.Total.UCor
 	a.Total.UOrd = a.Ordos.Total.UOrd
+
 	//calculate SCOR Total
 	a.Total.SCOR = a.Atreides.Total.SCOR + a.Harkonnen.Total.SCOR + a.Corrino.Total.SCOR + a.Ordos.Total.SCOR
 	///calculate SORD Total
 	a.Total.SORD = a.Atreides.Total.SORD + a.Harkonnen.Total.SORD + a.Corrino.Total.SORD + a.Ordos.Total.SORD
-	a.Total.Total = a.Total.UAtr + a.Total.UHar + a.Total.UCor + a.Total.UOrd + a.Total.SCOR + a.Total.SORD
+	a.Total.SHAR = a.Atreides.Total.SHAR + a.Harkonnen.Total.SHAR + a.Corrino.Total.SHAR + a.Ordos.Total.SHAR
+	a.Total.Total = a.Total.UAtr + a.Total.UHar + a.Total.UCor + a.Total.UOrd + a.Total.SCOR + a.Total.SORD + a.Total.SHAR
 }
 
 func (r Reward) EncodeJson() string {
