@@ -82,7 +82,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	height := ReturnHeight(chainCode)
 	// height := 10000
 	for height < 300000 {
-
+		writeheight := height + 1
+		WriteHeight(chainCode, writeheight)
 		// lastBlock := GetLastBlock(chainCode)
 		// if height > lastBlock {
 		// 	fmt.Printf("height : %v lastblock:%v time lock\n", height, lastBlock)
@@ -399,8 +400,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			})
 
 		}
-		height += 1
-		WriteHeight(chainCode, height)
+
 		if err := g.Wait(); err != nil {
 			log.Panicln(err.Error())
 		}
