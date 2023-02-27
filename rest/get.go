@@ -19,6 +19,7 @@ type ToTalResponse struct {
 	UOrd    string `json:"uord"`
 	SCOR    string `json:"scor"`
 	SORD    string `json:"sord"`
+	SHAR    string `json:"shar"`
 	SATR    string `json:"satr"`
 	Total   string `json:"total"`
 }
@@ -42,6 +43,8 @@ func Root(c *gin.Context) {
 			UOrd:    fmt.Sprintf("%v", el.Total.UOrd),
 			SCOR:    fmt.Sprintf("%v", el.Total.SCOR),
 			SORD:    fmt.Sprintf("%v", el.Total.SORD),
+			SATR:    fmt.Sprintf("%v", el.Total.SATR),
+			SHAR:    fmt.Sprintf("%v", el.Total.SHAR),
 			Total:   fmt.Sprintf("%v", el.Total.Total),
 		}
 		res = append(res, total)
@@ -196,6 +199,8 @@ type MyRewardResponse struct {
 	UOrd    string `json:"uord"`
 	SCor    string `json:"scor"`
 	SOrd    string `json:"sord"`
+	SHar    string `json:"shar"`
+	SAtr    string `json:"satr"`
 	Total   string `json:"total"`
 }
 
@@ -217,6 +222,8 @@ func UserReward(c *gin.Context) {
 			UOrd:    fmt.Sprintf("%v", a.Total.UOrd),
 			SCor:    fmt.Sprintf("%v", a.Total.SCOR),
 			SOrd:    fmt.Sprintf("%v", a.Total.SORD),
+			SAtr:    fmt.Sprintf("%v", a.Total.SATR),
+			SHar:    fmt.Sprintf("%v", a.Total.SHAR),
 			Total:   fmt.Sprintf("%v", a.Total.Total),
 		}
 		c.JSON(200, myReward)
