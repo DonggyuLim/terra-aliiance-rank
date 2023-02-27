@@ -91,7 +91,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		delegationsData, err := GetDelegations(height, chainCode)
 		delegations := delegationsData.Deligations
 		if len(delegations) == 0 || err != nil {
-			fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
+			// fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
 			height += 1
 			WriteHeight(chainCode, height)
 			continue
@@ -285,7 +285,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							db.UpdateOne(filter, claimUpdate)
 
 						} else {
-							fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
+							// fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
 							update := bson.D{
 								{
 									Key: "$set", Value: bson.D{
@@ -332,7 +332,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							db.UpdateOne(filter, claimUpdate)
 
 						} else {
-							fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
+							// fmt.Printf("Reward Update!! chain : %v height :%v account :%v\n ", chainCode, height, delegation.DelegatorAddress)
 							update := bson.D{
 								{
 									Key: "$set", Value: bson.D{
