@@ -164,7 +164,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						o := a.Atreides.Rewards[delegation.ValidatorAddress]
 						claimAtr := (o.UAtr - reward.UAtr)
 
-						if o.UAtr > reward.UAtr && (percent.PercentOf(claimAtr, o.UAtr) >= 10) {
+						if o.UAtr > reward.UAtr && (percent.PercentOf(claimAtr, o.UAtr) >= 90) {
 							//Tax 제외
 							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
@@ -210,7 +210,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					case 1:
 						o := a.Harkonnen.Rewards[delegation.ValidatorAddress]
 						claimhar := (o.UHar - reward.UHar)
-						if o.UHar > reward.UHar && (percent.PercentOf(claimhar, o.UHar) >= 10) {
+						if o.UHar > reward.UHar && (percent.PercentOf(claimhar, o.UHar) >= 90) {
 
 							fmt.Printf("Claim! chain: %v height: %v account: %v \n", chainCode, height, delegation.DelegatorAddress)
 
@@ -255,7 +255,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 						o := a.Corrino.Rewards[delegation.ValidatorAddress]
 						claimCor := (o.UCor - reward.UCor)
-						if o.UCor > reward.UCor && (percent.PercentOf(claimCor, o.UCor) >= 10) {
+						if o.UCor > reward.UCor && (percent.PercentOf(claimCor, o.UCor) >= 90) {
 
 							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
@@ -299,7 +299,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					case 3:
 						o := a.Ordos.Rewards[delegation.ValidatorAddress]
 						claimOrd := (o.UOrd - reward.UOrd)
-						if o.UOrd > reward.UOrd && (percent.PercentOf(claimOrd, o.UOrd) >= 10) {
+						if o.UOrd > reward.UOrd && (percent.PercentOf(claimOrd, o.UOrd) >= 90) {
 
 							fmt.Printf("Claim! chain : %v height :%v account :%v \n", chainCode, height, delegation.DelegatorAddress)
 							// utils.PrettyJson(o)
