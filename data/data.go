@@ -35,21 +35,47 @@ const (
 
 func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
-	w := &sync.WaitGroup{}
-	w.Add(5)
-	go MakeReward(w, ATREIDES)
-	go MakeReward(w, Harkonnen)
-	go MakeReward(w, CORRINO)
-	go MakeReward(w, ORDOS)
-	go MakeTotal(w)
-	wg.Wait()
+	// w := &sync.WaitGroup{}
+	// w.Add(5)
+	// go MakeReward(w, ATREIDES)
+	// go MakeReward(w, Harkonnen)
+	// go MakeReward(w, CORRINO)
+	// go MakeReward(w, ORDOS)
+	// go MakeTotal(w)
+	// wg.Wait()
+	DeleteCorrinoAndOrdos()
 }
 
+func DeleteCorrinoAndOrdos() {
+	accountList, err := db.FindAll()
+	if err != nil || len(accountList) == 0 {
+		fmt.Println("Delete None")
+	}
+	for _, a := range accountList {
+		m := make(map[string]account.Reward)
+		corrino := account.Chain{
+			Address: a.Corrino.Address,
+			Rewards: m,
+		}
+		a.Corrino = corrino
+
+		m2 := make(map[string]account.Reward)
+		ordos := account.Chain{
+			Address: a.Ordos.Address,
+			Rewards: m2,
+		}
+		a.Ordos = ordos
+
+		filter := bson.D{{Key: "address", Value: a.Address}}
+
+		db.ReplaceOne(filter, a)
+	}
+}
 func MakeTotal(wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	for {
-		time.Sleep(time.Second * 60)
+		time.Sleep(time.Second * 600)
 		fmt.Println("===========Total!================")
 		accountList, err := db.FindAll()
 		if err != nil || len(accountList) == 0 {
