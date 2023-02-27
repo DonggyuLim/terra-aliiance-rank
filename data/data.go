@@ -21,6 +21,7 @@ import (
 const (
 	sCOR = "ibc/D7AA592A1C1C00FE7C9E15F4BB7ADB4B779627DD3FBB3C877CD4DB27F56E35B4"
 	sORD = "ibc/3FA98D26F2D6CCB58D8E4D1B332C6EB8EE4AC7E3F0AD5B5B05201155CEB1AD1D"
+
 	uatr = "uatr"
 	uhar = "uhar"
 	ucor = "ucor"
@@ -43,39 +44,7 @@ func Main(wg *sync.WaitGroup) {
 	go MakeReward(w, ORDOS)
 	go MakeTotal(w)
 	wg.Wait()
-	// DeleteCorrinoAndOrdos()
 }
-
-// func DeleteCorrinoAndOrdos() {
-// 	accountList, err := db.FindAll()
-// 	if err != nil || len(accountList) == 0 {
-// 		fmt.Println("Delete None")
-// 	}
-// 	for _, a := range accountList {
-// 		m := make(map[string]account.Reward)
-// 		corrino := account.Chain{
-// 			Address: a.Corrino.Address,
-// 			Rewards: m,
-// 		}
-// 		a.Corrino = corrino
-// 		a.Corrino.Claim = account.Claim{}
-// 		a.Total.UCor = 0
-
-// 		m2 := make(map[string]account.Reward)
-// 		ordos := account.Chain{
-// 			Address: a.Ordos.Address,
-// 			Rewards: m2,
-// 		}
-// 		a.Ordos = ordos
-// 		a.Ordos.Claim = account.Claim{}
-// 		a.Total.UOrd = 0
-// 		a.Total.Total = 0
-// 		filter := bson.D{{Key: "address", Value: a.Address}}
-
-// 		db.ReplaceOne(filter, a)
-// 	}
-// 	fmt.Println("set end")
-// }
 
 func MakeTotal(wg *sync.WaitGroup) {
 	defer wg.Done()
@@ -159,6 +128,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				// fmt.Println("reward loop start!")
 				for _, re := range resReward {
 					switch re.Denom {
+
 					case sCOR:
 						amount, err := strconv.Atoi(re.Amount)
 						utils.PanicError(err)
@@ -183,6 +153,10 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						amount, err := strconv.Atoi(re.Amount)
 						utils.PanicError(err)
 						reward.UOrd = amount
+					default:
+						amount, err := strconv.Atoi(re.Amount)
+						utils.PanicError(err)
+						reward.SHAR = amount
 					}
 				}
 				filter := bson.D{
