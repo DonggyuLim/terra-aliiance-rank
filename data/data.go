@@ -21,7 +21,8 @@ import (
 const (
 	sCOR = "ibc/D7AA592A1C1C00FE7C9E15F4BB7ADB4B779627DD3FBB3C877CD4DB27F56E35B4"
 	sORD = "ibc/3FA98D26F2D6CCB58D8E4D1B332C6EB8EE4AC7E3F0AD5B5B05201155CEB1AD1D"
-
+	sATR = "ibc/95287CFB16A09D3FE1D0B1E34B6725A380DD2A40AEF4F496B3DAF6F0D901695B"
+	sHAR = "ibc/51B1594844CCB9438C4EF3720B7ADD4398AC5D52E073CA7E592E675C6E4163EF"
 	uatr = "uatr"
 	uhar = "uhar"
 	ucor = "ucor"
@@ -124,11 +125,19 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					SCOR:       0,
 					SORD:       0,
 					SHAR:       0,
+					SATR:       0,
 				}
 				// fmt.Println("reward loop start!")
 				for _, re := range resReward {
 					switch re.Denom {
-
+					case sATR:
+						amount, err := strconv.Atoi(re.Amount)
+						utils.PanicError(err)
+						reward.SATR = amount
+					case sHAR:
+						amount, err := strconv.Atoi(re.Amount)
+						utils.PanicError(err)
+						reward.SHAR = amount
 					case sCOR:
 						amount, err := strconv.Atoi(re.Amount)
 						utils.PanicError(err)
@@ -153,10 +162,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						amount, err := strconv.Atoi(re.Amount)
 						utils.PanicError(err)
 						reward.UOrd = amount
-					default:
-						amount, err := strconv.Atoi(re.Amount)
-						utils.PanicError(err)
-						reward.SHAR = amount
+
 					}
 				}
 				filter := bson.D{
@@ -179,6 +185,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Atreides.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Atreides.Claim.SORD
 							claimSHAR := (o.SHAR - reward.SHAR) + a.Atreides.Claim.SHAR
+							claimSATR := (o.SATR - reward.SATR) + a.Atreides.Claim.SATR
 							claimUpdate := bson.D{
 								{
 									Key: "$set", Value: bson.D{
@@ -187,6 +194,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 											{Key: "scor", Value: claimSCOR},
 											{Key: "sord", Value: claimSORD},
 											{Key: "shar", Value: claimSHAR},
+											{Key: "satr", Value: claimSATR},
 										},
 										},
 									},
@@ -197,6 +205,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										{Key: fmt.Sprintf("atreides.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 										{Key: fmt.Sprintf("atreides.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										{Key: fmt.Sprintf("atreides.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
+										{Key: fmt.Sprintf("atreides.rewards.%s.satr", delegation.ValidatorAddress), Value: reward.SATR},
 									},
 								},
 							}
@@ -211,6 +220,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										{Key: fmt.Sprintf("atreides.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 										{Key: fmt.Sprintf("atreides.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										{Key: fmt.Sprintf("atreides.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
+										{Key: fmt.Sprintf("atreides.rewards.%s.satr", delegation.ValidatorAddress), Value: reward.SATR},
 									},
 								},
 							}
@@ -228,6 +238,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Harkonnen.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Harkonnen.Claim.SORD
 							claimSHAR := (o.SHAR - reward.SHAR) + a.Harkonnen.Claim.SHAR
+							claimSATR := (o.SATR - reward.SATR) + a.Harkonnen.Claim.SATR
 							claimUpdate := bson.D{
 								{
 									Key: "$set", Value: bson.D{
@@ -236,6 +247,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 											{Key: fmt.Sprintf("harkonnen.claim.%s.scor", delegation.ValidatorAddress), Value: claimSCOR},
 											{Key: fmt.Sprintf("harkonnen.claim.%s.sord", delegation.ValidatorAddress), Value: claimSORD},
 											{Key: fmt.Sprintf("harkonnen.claim.%s.shar", delegation.ValidatorAddress), Value: claimSHAR},
+											{Key: fmt.Sprintf("harkonnen.claim.%s.satr", delegation.ValidatorAddress), Value: claimSATR},
 										},
 										},
 									},
@@ -246,6 +258,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										{Key: fmt.Sprintf("harkonnen.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 										{Key: fmt.Sprintf("harkonnen.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										{Key: fmt.Sprintf("harkonnen.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
+										{Key: fmt.Sprintf("harkonnen.rewards.%s.satr", delegation.ValidatorAddress), Value: reward.SATR},
 									},
 								},
 							}
@@ -260,6 +273,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										{Key: fmt.Sprintf("harkonnen.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 										{Key: fmt.Sprintf("harkonnen.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										{Key: fmt.Sprintf("harkonnen.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
+										{Key: fmt.Sprintf("harkonnen.rewards.%s.satr", delegation.ValidatorAddress), Value: reward.SATR},
 									},
 								},
 							}
@@ -278,6 +292,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Corrino.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Corrino.Claim.SORD
 							claimSHAR := (o.SHAR - reward.SHAR) + a.Corrino.Claim.SHAR
+							claimSATR := (o.SATR - reward.SATR) + a.Corrino.Claim.SATR
 							claimUpdate := bson.D{
 								{
 									Key: "$set", Value: bson.D{
@@ -285,7 +300,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 											{Key: "ucor", Value: claimCor + a.Corrino.Claim.UCor},
 											{Key: "scor", Value: claimSCOR},
 											{Key: "sord", Value: claimSORD},
-											{Key: "sord", Value: claimSHAR},
+											{Key: "shar", Value: claimSHAR},
+											{Key: "satr", Value: claimSATR},
 										},
 										},
 									},
@@ -295,6 +311,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 									{Key: fmt.Sprintf("corrino.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 									{Key: fmt.Sprintf("corrino.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 									{Key: fmt.Sprintf("corrino.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
+									{Key: fmt.Sprintf("corrino.rewards.%s.satr", delegation.ValidatorAddress), Value: reward.SATR},
 								},
 								},
 							}
@@ -309,6 +326,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										{Key: fmt.Sprintf("corrino.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 										{Key: fmt.Sprintf("corrino.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										{Key: fmt.Sprintf("corrino.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
+										{Key: fmt.Sprintf("corrino.rewards.%s.satr", delegation.ValidatorAddress), Value: reward.SATR},
 									},
 								},
 							}
@@ -327,6 +345,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 							claimSCOR := (o.SCOR - reward.SCOR) + a.Ordos.Claim.SCOR
 							claimSORD := (o.SORD - reward.SORD) + a.Ordos.Claim.SORD
 							claimSHAR := (o.SHAR - reward.SHAR) + a.Ordos.Claim.SHAR
+							claimSATR := (o.SATR - reward.SATR) + a.Ordos.Claim.SATR
 							claimUpdate := bson.D{
 								{
 									Key: "$set", Value: bson.D{
@@ -335,6 +354,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 											{Key: "scor", Value: claimSCOR},
 											{Key: "sord", Value: claimSORD},
 											{Key: "shar", Value: claimSHAR},
+											{Key: "satr", Value: claimSATR},
 										},
 										},
 									},
@@ -345,6 +365,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										{Key: fmt.Sprintf("ordos.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 										{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										{Key: fmt.Sprintf("ordos.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
+										{Key: fmt.Sprintf("ordos.rewards.%s.satr", delegation.ValidatorAddress), Value: reward.SATR},
 									},
 								},
 							}
@@ -360,6 +381,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										{Key: fmt.Sprintf("ordos.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 										{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
 										{Key: fmt.Sprintf("ordos.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
+										{Key: fmt.Sprintf("ordos.rewards.%s.satr", delegation.ValidatorAddress), Value: reward.SATR},
 									},
 								},
 							}
@@ -378,7 +400,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 		}
 		height += 1
-		WriteHeight(chainCode, height+1)
+		WriteHeight(chainCode, height)
 		if err := g.Wait(); err != nil {
 			log.Panicln(err.Error())
 		}

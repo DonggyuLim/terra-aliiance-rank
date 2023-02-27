@@ -19,6 +19,7 @@ type ToTalResponse struct {
 	UOrd    string `json:"uord"`
 	SCOR    string `json:"scor"`
 	SORD    string `json:"sord"`
+	SATR    string `json:"satr"`
 	Total   string `json:"total"`
 }
 
