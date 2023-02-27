@@ -35,15 +35,15 @@ const (
 
 func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
-	// w := &sync.WaitGroup{}
-	// w.Add(5)
-	// go MakeReward(w, ATREIDES)
-	// go MakeReward(w, Harkonnen)
-	// go MakeReward(w, CORRINO)
-	// go MakeReward(w, ORDOS)
-	// go MakeTotal(w)
-	// wg.Wait()
-	DeleteCorrinoAndOrdos()
+	w := &sync.WaitGroup{}
+	w.Add(5)
+	go MakeReward(w, ATREIDES)
+	go MakeReward(w, Harkonnen)
+	go MakeReward(w, CORRINO)
+	go MakeReward(w, ORDOS)
+	go MakeTotal(w)
+	wg.Wait()
+	// DeleteCorrinoAndOrdos()
 }
 
 func DeleteCorrinoAndOrdos() {
@@ -58,19 +58,24 @@ func DeleteCorrinoAndOrdos() {
 			Rewards: m,
 		}
 		a.Corrino = corrino
-
+		a.Corrino.Claim = account.Claim{}
+		a.Total.UCor = 0
 		m2 := make(map[string]account.Reward)
 		ordos := account.Chain{
 			Address: a.Ordos.Address,
 			Rewards: m2,
 		}
 		a.Ordos = ordos
+		a.Ordos.Claim = account.Claim{}
+		a.Total.UOrd = 0
 
 		filter := bson.D{{Key: "address", Value: a.Address}}
 
 		db.ReplaceOne(filter, a)
 	}
+	fmt.Println("set end")
 }
+
 func MakeTotal(wg *sync.WaitGroup) {
 	defer wg.Done()
 
