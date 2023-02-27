@@ -400,7 +400,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			})
 
 		}
-
+		height += 1
 		if err := g.Wait(); err != nil {
 			log.Panicln(err.Error())
 		}
