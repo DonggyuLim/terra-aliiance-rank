@@ -338,7 +338,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										{Key: fmt.Sprintf("ordos.rewards.%s.uord", delegation.ValidatorAddress), Value: reward.UOrd},
 										{Key: fmt.Sprintf("ordos.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 										{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
-										{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SHAR},
+										{Key: fmt.Sprintf("ordos.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
 									},
 								},
 							}
@@ -353,7 +353,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 										{Key: fmt.Sprintf("ordos.rewards.%s.uord", delegation.ValidatorAddress), Value: reward.UOrd},
 										{Key: fmt.Sprintf("ordos.rewards.%s.scor", delegation.ValidatorAddress), Value: reward.SCOR},
 										{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SORD},
-										{Key: fmt.Sprintf("ordos.rewards.%s.sord", delegation.ValidatorAddress), Value: reward.SHAR},
+										{Key: fmt.Sprintf("ordos.rewards.%s.shar", delegation.ValidatorAddress), Value: reward.SHAR},
 									},
 								},
 							}
