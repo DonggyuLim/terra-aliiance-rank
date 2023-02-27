@@ -18,23 +18,23 @@ import (
 )
 
 type DB struct {
-	db         *mongo.Client
+	client     *mongo.Client
 	url        string
 	dbName     string
 	collection string
 	sync.Mutex
 }
 
-var d DB
+var db DB
 
 func Connect() {
 
-	d.url = utils.LoadENV("DBURL", "db.env")
-	d.dbName = utils.LoadENV("DBNAME", "db.env")
-	d.collection = utils.LoadENV("Collection", "db.env")
+	db.url = utils.LoadENV("DBURL", "db.env")
+	db.dbName = utils.LoadENV("DBNAME", "db.env")
+	db.collection = utils.LoadENV("Collection", "db.env")
 	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
 	clientOptions := options.Client().
-		ApplyURI(d.url).
+		ApplyURI(db.url).
 		SetServerAPIOptions(serverAPIOptions)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -44,29 +44,29 @@ func Connect() {
 		panic(err)
 	}
 
-	d.db = client
-	// fmt.Println(d)
+	db.client = client
+	// fmt.Println(db)
 	fmt.Println("============DB connect==================")
 }
 
 func Close() {
-	err := d.db.Disconnect(context.TODO())
+	err := db.client.Disconnect(context.TODO())
 	utils.HandleErr("DB Disconnect", err)
 	fmt.Println("=========Connection to MongoDB closed=============")
 }
 func GetCollection() *mongo.Collection {
-	d.Mutex.Lock()
-	defer d.Mutex.Unlock()
-	return d.db.Database(d.dbName).Collection(d.collection)
+	db.Mutex.Lock()
+	defer db.Mutex.Unlock()
+	return db.client.Database(db.dbName).Collection(db.collection)
 }
 
 func Insert(account account.Account) error {
-	d.Mutex.Lock()
-	defer d.Mutex.Unlock()
+	db.Mutex.Lock()
+	defer db.Mutex.Unlock()
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 	_, err := collection.InsertOne(ctx, account)
 	if err != nil {
 		return err
@@ -77,8 +77,8 @@ func Insert(account account.Account) error {
 }
 
 func InsertMany(data []account.Account) {
-	d.Mutex.Lock()
-	defer d.Mutex.Unlock()
+	db.Mutex.Lock()
+	defer db.Mutex.Unlock()
 	var a []interface{}
 	for _, el := range data {
 		a = append(a, el)
@@ -86,7 +86,7 @@ func InsertMany(data []account.Account) {
 	exp := 20 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 	_, err := collection.InsertMany(ctx, a)
 
 	if err != nil {
@@ -97,13 +97,13 @@ func InsertMany(data []account.Account) {
 }
 
 func FindOne(filter bson.D) (account.Account, error) {
-	d.Mutex.Lock()
-	defer d.Mutex.Unlock()
+	db.Mutex.Lock()
+	defer db.Mutex.Unlock()
 	a := account.Account{}
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 	err := collection.FindOne(ctx, filter).Decode(&a)
 
 	if err != nil {
@@ -117,12 +117,12 @@ func FindOne(filter bson.D) (account.Account, error) {
 }
 
 func Find(key, value, desc string, limit int64) ([]account.Account, error) {
-	d.Mutex.Lock()
-	defer d.Mutex.Unlock()
+	db.Mutex.Lock()
+	defer db.Mutex.Unlock()
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 	findOptions := options.Find()
 
 	findOptions.SetLimit(limit)
@@ -141,12 +141,12 @@ func Find(key, value, desc string, limit int64) ([]account.Account, error) {
 }
 
 func FindAll() ([]account.Account, error) {
-	d.Mutex.Lock()
-	defer d.Mutex.Unlock()
+	db.Mutex.Lock()
+	defer db.Mutex.Unlock()
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 	findOptions := options.Find()
 
 	filter := bson.D{}
@@ -164,7 +164,7 @@ func FindAndReplace(filter, update bson.D) {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 
 	result := collection.FindOneAndReplace(ctx, filter, update)
 	fmt.Println("DB update")
@@ -176,7 +176,7 @@ func ReplaceOne(filter bson.D, account account.Account) {
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 
 	_, err := collection.ReplaceOne(ctx, filter, account)
 
@@ -184,13 +184,13 @@ func ReplaceOne(filter bson.D, account account.Account) {
 }
 
 func UpdateOne(filter, update bson.D) {
-	d.Mutex.Lock()
-	defer d.Mutex.Unlock()
+	db.Mutex.Lock()
+	defer db.Mutex.Unlock()
 
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 	_, err := collection.UpdateOne(ctx, filter, update)
 
 	utils.PanicError(err)
@@ -198,24 +198,24 @@ func UpdateOne(filter, update bson.D) {
 }
 
 func UpdateOneMap(filter bson.D, update bson.M) {
-	d.Mutex.Lock()
-	defer d.Mutex.Unlock()
+	db.Mutex.Lock()
+	defer db.Mutex.Unlock()
 	exp := 10 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 	_, err := collection.UpdateOne(ctx, filter, update)
 	utils.PanicError(err)
 	// fmt.Println(err.Error())
 }
 
 func FindChain(address string, chainCode int, c *account.Reward) error {
-	d.Mutex.Lock()
-	defer d.Mutex.Unlock()
+	db.Mutex.Lock()
+	defer db.Mutex.Unlock()
 	exp := 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), exp)
 	defer cancel()
-	collection := d.db.Database(d.dbName).Collection(d.collection)
+	collection := db.client.Database(db.dbName).Collection(db.collection)
 
 	var projection bson.D
 	switch chainCode {
