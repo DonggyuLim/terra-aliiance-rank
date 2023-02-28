@@ -106,7 +106,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 		delegations := delegationData.Deligations
 		// fmt.Println(delegations)
-		if delegations == nil || err != nil {
+		if len(delegations) == 0 || err != nil {
 			// fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
 			height += 1
 			continue
