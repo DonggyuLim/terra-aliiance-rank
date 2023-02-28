@@ -51,7 +51,7 @@ func GetDelegations2(height, chainCode int) (request.DelegationRequest, error) {
 	endpoint := fmt.Sprintf("%s/terra/alliances/delegations?pagination.limit=100000",
 		GetEndopoint(chainCode),
 	)
-	fmt.Println(endpoint)
+
 	var req request.DelegationRequest
 	_, err := client.SetSuccessResult(&req).Get(endpoint)
 
