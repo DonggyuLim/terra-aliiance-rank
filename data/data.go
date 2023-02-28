@@ -38,12 +38,12 @@ const (
 func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
 	w := &sync.WaitGroup{}
-	w.Add(1)
-	// go MakeReward(w, ATREIDES)
+	w.Add(5)
+	go MakeReward(w, ATREIDES)
 	go MakeReward(w, Harkonnen)
-	// go MakeReward(w, CORRINO)
-	// go MakeReward(w, ORDOS)
-	// go MakeTotal(w)
+	go MakeReward(w, CORRINO)
+	go MakeReward(w, ORDOS)
+	go MakeTotal(w)
 	wg.Wait()
 }
 
@@ -116,7 +116,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		for i := 0; i <= len(delegations)-1; i++ {
 			delegation := delegations[i].Delegation
 
-			go func() error {
+			g.Go(func() error {
 				// resReward, err := GetRewards(
 				// 	chainCode,
 				// 	height,
@@ -407,7 +407,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					db.Insert(a)
 				}
 				return nil
-			}()
+			})
 
 			if err := g.Wait(); err != nil {
 				log.Panicln(err.Error())
