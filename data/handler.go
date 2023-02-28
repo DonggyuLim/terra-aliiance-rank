@@ -48,13 +48,13 @@ func GetDelegations2(height, chainCode int) (request.DelegationRequest, error) {
 
 	client := req.R().
 		SetHeader("x-cosmos-block-height", value).SetHeader("Content-Type", "application/json")
-	endpoint := fmt.Sprintf("%s/terra/alliances/delegations?pagination.limit=10000",
+	endpoint := fmt.Sprintf("%s/terra/alliances/delegations",
 		GetEndopoint(chainCode),
 		// GetAddress(chainCode, address),
 	)
 
 	var req request.DelegationRequest
-	_, err := client.SetSuccessResult(&req).Get(endpoint)
+	_, err := client.SetSuccessResult(&req).SetQueryParam("pagination.limit", "1000000").Get(endpoint)
 	fmt.Println(req)
 	return req, err
 }
