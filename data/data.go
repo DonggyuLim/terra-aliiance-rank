@@ -92,7 +92,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		}
 		res := GetDelegationsHeight(c, height)
 		// utils.PrettyJson(res)
-
+		utils.PrettyJson(res)
 		for _, el := range res {
 			d := el.Delegation
 			rw := account.Reward{}
