@@ -17,5 +17,6 @@ func main() {
 	go data.Main(wg)
 
 	go rest.Start(wg)
+
 	wg.Wait()
 }

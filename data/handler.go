@@ -1,12 +1,17 @@
 package data
 
 import (
+	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/DonggyuLim/Alliance-Rank/request"
 	"github.com/DonggyuLim/Alliance-Rank/utils"
 	"github.com/imroc/req/v3"
+	alliancemoduletypes "github.com/terra-money/alliance/x/alliance/types"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 func GetEndopoint(a int) string {
@@ -23,7 +28,37 @@ func GetEndopoint(a int) string {
 	return ""
 }
 
-func GetRewards(chainCode, height int, delegator, validator, denom string) ([]request.Reward, error) {
+func GetAddress(chainCode int, address string) string {
+	switch chainCode {
+	case 0:
+		return utils.MakeAddressPrefix(address, "atreides")
+	case 1:
+		return utils.MakeAddressPrefix(address, "harkonnen")
+	case 2:
+		return utils.MakeAddressPrefix(address, "corrino")
+	case 3:
+		return utils.MakeAddressPrefix(address, "ordos")
+	}
+	return ""
+}
+
+func GetDelegations2(height, chainCode int) (request.DelegationRequest, error) {
+
+	value := fmt.Sprintf("%v", height)
+
+	client := req.R().
+		SetHeader("x-cosmos-block-height", value).SetHeader("Content-Type", "application/json")
+	endpoint := fmt.Sprintf("%s/terra/alliances/delegations",
+		GetEndopoint(chainCode),
+		// GetAddress(chainCode, address),
+	)
+
+	var req request.DelegationRequest
+	_, err := client.SetSuccessResult(&req).Get(endpoint)
+
+	return req, err
+}
+func GetRewards2(chainCode, height int, delegator, validator, denom string) ([]request.Reward, error) {
 
 	client := req.R().
 		SetHeader("x-cosmos-block-height", fmt.Sprintf("%v", height)).SetHeader("Content-Type", "application/json")
@@ -40,36 +75,38 @@ func GetRewards(chainCode, height int, delegator, validator, denom string) ([]re
 
 	return req.Rewards, err
 }
-
-func GetAddress(chainCode int, address string) string {
-	switch chainCode {
-	case 0:
-		return utils.MakeAddressPrefix(address, "atreides")
-	case 1:
-		return utils.MakeAddressPrefix(address, "harkonnen")
-	case 2:
-		return utils.MakeAddressPrefix(address, "corrino")
-	case 3:
-		return utils.MakeAddressPrefix(address, "ordos")
+func GetDelegations(c alliancemoduletypes.QueryClient, height int) (*alliancemoduletypes.QueryAlliancesDelegationsResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	req := &alliancemoduletypes.QueryAllAlliancesDelegationsRequest{}
+	md := metadata.New(map[string]string{"x-cosmos-block-height": fmt.Sprintf("%v", height)})
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	var header metadata.MD
+	res, err := c.AllAlliancesDelegations(ctx, req, grpc.Header(&header))
+	if err != nil {
+		return nil, err
 	}
-	return ""
+	return res, err
+
 }
 
-func GetDelegations(height, chainCode int) (request.DelegationRequest, error) {
+func GetRewards(c alliancemoduletypes.QueryClient, height int, delegator, validator, denom string) (*alliancemoduletypes.QueryAllianceDelegationRewardsResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	req := &alliancemoduletypes.QueryAllianceDelegationRewardsRequest{
+		DelegatorAddr: delegator,
+		ValidatorAddr: validator,
+		Denom:         denom,
+	}
+	md := metadata.New(map[string]string{"x-cosmos-block-height": fmt.Sprintf("%v", height)})
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	var header metadata.MD
+	res, err := c.AllianceDelegationRewards(ctx, req, grpc.Header(&header))
+	if err != nil {
+		return nil, err
+	}
+	return res, err
 
-	value := fmt.Sprintf("%v", height)
-
-	client := req.R().
-		SetHeader("x-cosmos-block-height", value).SetHeader("Content-Type", "application/json")
-	endpoint := fmt.Sprintf("%s/terra/alliances/delegations",
-		GetEndopoint(chainCode),
-		// GetAddress(chainCode, address),
-	)
-
-	var req request.DelegationRequest
-	_, err := client.SetSuccessResult(&req).Get(endpoint)
-
-	return req, err
 }
 
 func GetLastBlock(chainCode int) int {

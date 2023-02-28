@@ -4,18 +4,18 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strconv"
 	"sync"
 	"time"
 
 	"github.com/DonggyuLim/Alliance-Rank/account"
+	"github.com/DonggyuLim/Alliance-Rank/client"
 	"github.com/DonggyuLim/Alliance-Rank/db"
 	"github.com/DonggyuLim/Alliance-Rank/utils"
 	"github.com/dariubs/percent"
+	"golang.org/x/sync/errgroup"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -38,11 +38,11 @@ const (
 func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
 	w := &sync.WaitGroup{}
-	w.Add(5)
-	go MakeReward(w, ATREIDES)
+	w.Add(1)
+	// go MakeReward(w, ATREIDES)
 	go MakeReward(w, Harkonnen)
-	go MakeReward(w, CORRINO)
-	go MakeReward(w, ORDOS)
+	// go MakeReward(w, CORRINO)
+	// go MakeReward(w, ORDOS)
 	go MakeTotal(w)
 	wg.Wait()
 }
@@ -79,19 +79,33 @@ func MakeTotal(wg *sync.WaitGroup) {
 
 func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	defer wg.Done()
-	height := 10000
+	var height int
 
+	switch chainCode {
+	case 0:
+		height = 54247
+	case 1:
+		height = 66557
+	case 2:
+		height = 253258
+	case 3:
+		height = 108588
+	}
+
+	c := client.QueryClient()
+
+	// lastBlock := GetLastBlock(chainCode)
+	// if height > lastBlock {
+	// 	fmt.Printf("height : %v lastblock:%v time lock\n", height, lastBlock)
+	// 	time.Sleep(time.Minute * 5)
+	// 	continue
+	// }
 	for height < 300000 {
+		// delegationsData, err := GetDelegations(height, chainCode)
+		delegationData, err := GetDelegations(c, height)
 
-		// lastBlock := GetLastBlock(chainCode)
-		// if height > lastBlock {
-		// 	fmt.Printf("height : %v lastblock:%v time lock\n", height, lastBlock)
-		// 	time.Sleep(time.Minute * 5)
-		// 	continue
-		// }
-
-		delegationsData, err := GetDelegations(height, chainCode)
-		delegations := delegationsData.Deligations
+		delegations := delegationData.Delegations
+		// fmt.Println(delegations)
 		if len(delegations) == 0 || err != nil {
 			// fmt.Printf("chain : %v height: %v lastBlock: %v Not Delegate \n", chainCode, height, lastBlock)
 			height += 1
@@ -102,15 +116,22 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		for i := 0; i <= len(delegations)-1; i++ {
 			delegation := delegations[i].Delegation
 
-			g.Go(func() error {
+			go func() error {
+				// resReward, err := GetRewards(
+				// 	chainCode,
+				// 	height,
+				// 	delegation.DelegatorAddress,
+				// 	delegation.ValidatorAddress,
+				// 	delegation.Denom,
+				// )
 				resReward, err := GetRewards(
-					chainCode,
+					c,
 					height,
 					delegation.DelegatorAddress,
 					delegation.ValidatorAddress,
 					delegation.Denom,
 				)
-				if err != nil || len(resReward) == 0 {
+				if err != nil || len(resReward.Rewards) == 0 {
 					// fmt.Printf("chain: %v height:%v Not Reward!\n", chainCode, height)
 					return err
 				}
@@ -127,40 +148,31 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					SATR:       0,
 				}
 				// fmt.Println("reward loop start!")
-				for _, re := range resReward {
+				for _, re := range resReward.Rewards {
 					switch re.Denom {
 					case sATR:
-						amount, err := strconv.Atoi(re.Amount)
-						utils.PanicError(err)
-						reward.SATR = amount
+						reward.SATR = int(re.Amount.Int64())
 					case sHAR:
-						amount, err := strconv.Atoi(re.Amount)
-						utils.PanicError(err)
-						reward.SHAR = amount
+
+						reward.SHAR = int(re.Amount.Int64())
 					case sCOR:
-						amount, err := strconv.Atoi(re.Amount)
-						utils.PanicError(err)
-						reward.SCOR = amount
+
+						reward.SCOR = int(re.Amount.Int64())
 					case sORD:
-						amount, err := strconv.Atoi(re.Amount)
-						utils.PanicError(err)
-						reward.SORD = amount
+
+						reward.SORD = int(re.Amount.Int64())
 					case uatr:
-						amount, err := strconv.Atoi(re.Amount)
-						utils.PanicError(err)
-						reward.UAtr = amount
+
+						reward.UAtr = int(re.Amount.Int64())
 					case uhar:
-						amount, err := strconv.Atoi(re.Amount)
-						utils.PanicError(err)
-						reward.UHar = amount
+
+						reward.UHar = int(re.Amount.Int64())
 					case ucor:
-						amount, err := strconv.Atoi(re.Amount)
-						utils.PanicError(err)
-						reward.UCor = amount
+
+						reward.UCor = int(re.Amount.Int64())
 					case uord:
-						amount, err := strconv.Atoi(re.Amount)
-						utils.PanicError(err)
-						reward.UOrd = amount
+
+						reward.UOrd = int(re.Amount.Int64())
 
 					}
 				}
@@ -395,14 +407,13 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 					db.Insert(a)
 				}
 				return nil
-			})
+			}()
+
+			if err := g.Wait(); err != nil {
+				log.Panicln(err.Error())
+			}
 
 		}
 		height += 1
-		if err := g.Wait(); err != nil {
-			log.Panicln(err.Error())
-		}
-
 	}
-
 }

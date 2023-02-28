@@ -25,6 +25,13 @@ type DB struct {
 	sync.Mutex
 }
 
+type Height struct {
+	Atreides  int
+	Harkonnen int
+	Corrino   int
+	Ordos     int
+}
+
 var db DB
 
 func Connect() {

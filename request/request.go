@@ -1,6 +1,12 @@
 package request
 
-import "time"
+import (
+	"bytes"
+	"encoding/gob"
+	"time"
+
+	"github.com/DonggyuLim/Alliance-Rank/utils"
+)
 
 type AccountsReq struct {
 	Account    []AccountReq `json:"accounts"`
@@ -45,6 +51,11 @@ type DelegationData struct {
 		LastRewardClaimHeight string          `json:"last_reward_claim_height"`
 	} `json:"delegation"`
 	Balance Balance `json:"balance"`
+}
+
+func (d *DelegationData) EncodeByte(b []byte) {
+	encoder := gob.NewDecoder(bytes.NewReader(b))
+	utils.PanicError(encoder.Decode(&d))
 }
 
 type RewardHistory struct {
