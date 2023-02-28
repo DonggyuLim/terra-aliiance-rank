@@ -83,13 +83,13 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 	switch chainCode {
 	case 0:
-		height = 57135
+		height = 57295
 	case 1:
-		height = 69334
+		height = 69667
 	case 2:
-		height = 255747
+		height = 256201
 	case 3:
-		height = 111210
+		height = 111368
 	}
 
 	c := client.QueryClient(chainCode)
