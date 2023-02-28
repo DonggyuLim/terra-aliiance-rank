@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"sync"
 
 	alliancemoduletypes "github.com/terra-money/alliance/x/alliance/types"
@@ -26,6 +27,6 @@ func QueryClient(chainCode int) alliancemoduletypes.QueryClient {
 		grpc.WithBlock(),
 	)
 	client := alliancemoduletypes.NewQueryClient(conn)
-
+	fmt.Println(client)
 	return client
 }
