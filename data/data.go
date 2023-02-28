@@ -15,16 +15,6 @@ import (
 )
 
 const (
-	sCOR = "ibc/D7AA592A1C1C00FE7C9E15F4BB7ADB4B779627DD3FBB3C877CD4DB27F56E35B4"
-	sORD = "ibc/3FA98D26F2D6CCB58D8E4D1B332C6EB8EE4AC7E3F0AD5B5B05201155CEB1AD1D"
-	sATR = "ibc/95287CFB16A09D3FE1D0B1E34B6725A380DD2A40AEF4F496B3DAF6F0D901695B"
-	sHAR = "ibc/51B1594844CCB9438C4EF3720B7ADD4398AC5D52E073CA7E592E675C6E4163EF"
-	uatr = "uatr"
-	uhar = "uhar"
-	ucor = "ucor"
-	uord = "uord"
-)
-const (
 	ATREIDES = iota
 	Harkonnen
 	CORRINO
@@ -34,7 +24,7 @@ const (
 func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
 	w := &sync.WaitGroup{}
-	w.Add(1)
+	w.Add(5)
 	go MakeReward(w, ATREIDES)
 	go MakeReward(w, Harkonnen)
 	go MakeReward(w, CORRINO)
