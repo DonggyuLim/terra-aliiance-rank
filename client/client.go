@@ -8,16 +8,24 @@ import (
 )
 
 var once sync.Once
-var client alliancemoduletypes.QueryClient
 
-func QueryClient() alliancemoduletypes.QueryClient {
-	once.Do(func() {
-		conn, _ := grpc.Dial("localhost:19090",
-			grpc.WithInsecure(),
-			grpc.WithBlock(),
-		)
-		client = alliancemoduletypes.NewQueryClient(conn)
-	})
+func QueryClient(chainCode int) alliancemoduletypes.QueryClient {
+	var endpoint string
+	switch chainCode {
+	case 0:
+		endpoint = "localhost:9090"
+	case 1:
+		endpoint = "localhost:19090"
+	case 2:
+		endpoint = "localhost:29090"
+	case 3:
+		endpoint = "localhost:39090"
+	}
+	conn, _ := grpc.Dial(endpoint,
+		grpc.WithInsecure(),
+		grpc.WithBlock(),
+	)
+	client := alliancemoduletypes.NewQueryClient(conn)
 
 	return client
 }

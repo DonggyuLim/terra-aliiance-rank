@@ -92,7 +92,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		height = 108588
 	}
 
-	c := client.QueryClient()
+	c := client.QueryClient(chainCode)
 
 	// lastBlock := GetLastBlock(chainCode)
 	// if height > lastBlock {
