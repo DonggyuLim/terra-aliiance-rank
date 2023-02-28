@@ -184,6 +184,6 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				return nil
 			})
 		}
-		height += 1000
+		height += 100
 	}
 }
