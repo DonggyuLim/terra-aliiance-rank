@@ -39,8 +39,8 @@ func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
 	w := &sync.WaitGroup{}
 	w.Add(1)
-	go MakeReward(w, ATREIDES)
-	// go MakeReward(w, Harkonnen)
+	// go MakeReward(w, ATREIDES)
+	go MakeReward(w, Harkonnen)
 	// go MakeReward(w, CORRINO)
 	// go MakeReward(w, ORDOS)
 	// go MakeTotal(w)
