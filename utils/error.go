@@ -10,6 +10,6 @@ func HandleErr(message string, err error) {
 
 func PanicError(err error) {
 	if err != nil {
-		log.Panic(err.Error())
+		log.Fatal(err.Error())
 	}
 }

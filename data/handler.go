@@ -1,17 +1,15 @@
 package data
 
 import (
-	"context"
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/DonggyuLim/Alliance-Rank/request"
 	"github.com/DonggyuLim/Alliance-Rank/utils"
+
+	"github.com/cosmos/cosmos-sdk/types"
 	"github.com/imroc/req/v3"
-	alliancemoduletypes "github.com/terra-money/alliance/x/alliance/types"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
+	module "github.com/terra-money/alliance/x/alliance/types"
 )
 
 func GetEndopoint(a int) string {
@@ -42,73 +40,6 @@ func GetAddress(chainCode int, address string) string {
 	return ""
 }
 
-func GetDelegations2(height, chainCode int) (request.DelegationRequest, error) {
-
-	value := fmt.Sprintf("%v", height)
-
-	client := req.R().
-		SetHeader("x-cosmos-block-height", value).SetHeader("Content-Type", "application/json")
-	endpoint := fmt.Sprintf("%s/terra/alliances/delegations?pagination.limit=100000",
-		GetEndopoint(chainCode),
-	)
-
-	var req request.DelegationRequest
-	_, err := client.SetSuccessResult(&req).Get(endpoint)
-
-	return req, err
-}
-func GetRewards2(chainCode, height int, delegator, validator, denom string) ([]request.Reward, error) {
-
-	client := req.R().
-		SetHeader("x-cosmos-block-height", fmt.Sprintf("%v", height)).SetHeader("Content-Type", "application/json")
-	var req request.RewardRequest
-	endpoint := fmt.Sprintf("%s/terra/alliances/rewards/%s/%s/%s",
-		GetEndopoint(chainCode),
-		delegator,
-		validator,
-		denom,
-	)
-
-	//{delegator_addr}/{validator_addr}/{denom}
-	// endpoint := fmt.Sprintf("%s/terra/alliances/rewards/%s/{validator_addr}/{denom}", chain, el.deligator, validator, denom)
-	_, err := client.SetSuccessResult(&req).Get(endpoint)
-
-	return req.Rewards, err
-}
-func GetDelegations(c alliancemoduletypes.QueryClient, height int) (*alliancemoduletypes.QueryAlliancesDelegationsResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	req := &alliancemoduletypes.QueryAllAlliancesDelegationsRequest{}
-	md := metadata.New(map[string]string{"x-cosmos-block-height": fmt.Sprintf("%v", height)})
-	ctx = metadata.NewOutgoingContext(ctx, md)
-	var header metadata.MD
-	res, err := c.AllAlliancesDelegations(ctx, req, grpc.Header(&header))
-	if err != nil {
-		return nil, err
-	}
-	return res, err
-
-}
-
-func GetRewards(c alliancemoduletypes.QueryClient, height int, delegator, validator, denom string) (*alliancemoduletypes.QueryAllianceDelegationRewardsResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	req := &alliancemoduletypes.QueryAllianceDelegationRewardsRequest{
-		DelegatorAddr: delegator,
-		ValidatorAddr: validator,
-		Denom:         denom,
-	}
-	md := metadata.New(map[string]string{"x-cosmos-block-height": fmt.Sprintf("%v", height)})
-	ctx = metadata.NewOutgoingContext(ctx, md)
-	var header metadata.MD
-	res, err := c.AllianceDelegationRewards(ctx, req, grpc.Header(&header))
-	if err != nil {
-		return nil, err
-	}
-	return res, err
-
-}
-
 func GetLastBlock(chainCode int) int {
 	client := req.R()
 
@@ -124,38 +55,36 @@ func GetLastBlock(chainCode int) int {
 
 }
 
-func ReturnHeight(chainCode int) int {
-	var height int
-	switch chainCode {
-	case 0:
-		i, err := strconv.Atoi(utils.LoadENV("HEIGHT", "atr.env"))
-		utils.PanicError(err)
-		height = i
-	case 1:
-		i, err := strconv.Atoi(utils.LoadENV("HEIGHT", "har.env"))
-		utils.PanicError(err)
-		height = i
-	case 2:
-		i, err := strconv.Atoi(utils.LoadENV("HEIGHT", "cor.env"))
-		utils.PanicError(err)
-		height = i
-	case 3:
-		i, err := strconv.Atoi(utils.LoadENV("HEIGHT", "ord.env"))
-		utils.PanicError(err)
-		height = i
-	}
-	return height
-}
+func GetClaim(c module.QueryClient, address, validator string, height int) []types.Coin {
+	//현재 돌고 있는건 claim 한 것임.
+	var coinSlice []types.Coin
+	lastHeight := height
+	// fmt.Println(lastHeight)
 
-func WriteHeight(chainCode, height int) {
-	switch chainCode {
-	case 0:
-		utils.WriteENV("HEIGHT", strconv.Itoa(height), "atr.env")
-	case 1:
-		utils.WriteENV("HEIGHT", strconv.Itoa(height), "har.env")
-	case 2:
-		utils.WriteENV("HEIGHT", strconv.Itoa(height), "cor.env")
-	case 3:
-		utils.WriteENV("HEIGHT", strconv.Itoa(height), "ord.env")
+	for {
+
+		res := GetDelegationsByValidatorHeight(c, address, validator, lastHeight)
+		// utils.PrettyJson(res)
+
+		re := res[0]
+
+		coins, err := GetRewardHeight(c, address, validator, re.Balance.Denom, height-1)
+		if err != nil {
+			break
+		}
+
+		if err != nil || len(coins.Rewards) == 0 {
+			break
+		}
+
+		coinSlice = append(coinSlice, coins.Rewards...)
+
+		if re.Delegation.LastRewardClaimHeight == uint64(lastHeight) {
+			break
+		}
+		lastHeight = int(re.Delegation.LastRewardClaimHeight)
+
 	}
+
+	return coinSlice
 }

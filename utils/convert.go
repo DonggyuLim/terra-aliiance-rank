@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/btcsuite/btcutil/bech32"
 	"github.com/shopspring/decimal"
@@ -31,11 +32,11 @@ func MakeAddressPrefix(account, prefix string) string {
 	return accountEncode(prefix, bytes)
 }
 
-func PrettyJson(data interface{}) []byte {
+func PrettyJson(data interface{}) {
 	bytes, err := json.MarshalIndent(data, "", "   ")
 	PanicError(err)
-	// fmt.Println(string(bytes))
-	return bytes
+	fmt.Println(string(bytes))
+	// return bytes
 }
 
 func ChangeDeciaml(a string) decimal.Decimal {

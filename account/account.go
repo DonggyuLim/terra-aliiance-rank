@@ -6,6 +6,18 @@ import (
 	"encoding/json"
 
 	"github.com/DonggyuLim/Alliance-Rank/utils"
+	"github.com/cosmos/cosmos-sdk/types"
+)
+
+const (
+	sCOR = "ibc/D7AA592A1C1C00FE7C9E15F4BB7ADB4B779627DD3FBB3C877CD4DB27F56E35B4"
+	sORD = "ibc/3FA98D26F2D6CCB58D8E4D1B332C6EB8EE4AC7E3F0AD5B5B05201155CEB1AD1D"
+	sATR = "ibc/95287CFB16A09D3FE1D0B1E34B6725A380DD2A40AEF4F496B3DAF6F0D901695B"
+	sHAR = "ibc/51B1594844CCB9438C4EF3720B7ADD4398AC5D52E073CA7E592E675C6E4163EF"
+	uatr = "uatr"
+	uhar = "uhar"
+	ucor = "ucor"
+	uord = "uord"
 )
 
 type Account struct {
@@ -19,20 +31,42 @@ type Account struct {
 type Chain struct {
 	Address string            `json:"address"`
 	Rewards map[string]Reward `json:"rewards"` //key = validator Address
-	Claim   Claim             `json:"claim"`
 	Total   ChainTotal        `json:"total"`
 }
 
 type Reward struct {
-	LastHeight int `json:"last_height"`
-	UAtr       int `json:"uatr"`
-	UHar       int `json:"uhar"`
-	UOrd       int `json:"uord"`
-	UCor       int `json:"ucor"`
-	SCOR       int `json:"scor"`
-	SORD       int `json:"sord"`
-	SHAR       int `json:"shar"`
-	SATR       int `json:"satr"`
+	UAtr  int `json:"uatr"`
+	UHar  int `json:"uhar"`
+	UOrd  int `json:"uord"`
+	UCor  int `json:"ucor"`
+	SCOR  int `json:"scor"`
+	SORD  int `json:"sord"`
+	SHAR  int `json:"shar"`
+	SATR  int `json:"satr"`
+	Claim `json:"claim"`
+}
+
+func (r *Reward) Add(c []types.Coin) {
+	for _, re := range c {
+		switch re.Denom {
+		case sATR:
+			r.SATR += int(re.Amount.Int64())
+		case sHAR:
+			r.SHAR += int(re.Amount.Int64())
+		case sCOR:
+			r.SCOR += int(re.Amount.Int64())
+		case sORD:
+			r.SORD += int(re.Amount.Int64())
+		case uatr:
+			r.UAtr += int(re.Amount.Int64())
+		case uhar:
+			r.UHar += int(re.Amount.Int64())
+		case ucor:
+			r.UCor += int(re.Amount.Int64())
+		case uord:
+			r.UOrd += int(re.Amount.Int64())
+		}
+	}
 }
 
 type Claim struct {
@@ -45,6 +79,30 @@ type Claim struct {
 	SHAR int `json:"shar"`
 	SATR int `json:"satr"`
 }
+
+func (c *Claim) Add(coin []types.Coin) {
+	for _, re := range coin {
+		switch re.Denom {
+		case sATR:
+			c.SATR += int(re.Amount.Int64())
+		case sHAR:
+			c.SHAR += int(re.Amount.Int64())
+		case sCOR:
+			c.SCOR += int(re.Amount.Int64())
+		case sORD:
+			c.SORD += int(re.Amount.Int64())
+		case uatr:
+			c.UAtr += int(re.Amount.Int64())
+		case uhar:
+			c.UHar += int(re.Amount.Int64())
+		case ucor:
+			c.UCor += int(re.Amount.Int64())
+		case uord:
+			c.UOrd += int(re.Amount.Int64())
+		}
+	}
+}
+
 type Total struct {
 	UAtr  int ` json:"uatr"`
 	UCor  int ` json:"ucor"`
@@ -110,113 +168,6 @@ func (a *Account) FromBytes(data []byte) {
 	utils.PanicError(encoder.Decode(&a))
 }
 
-func (c *Chain) UpdateClaimAndReward(
-	delegator,
-	validator string,
-	r Reward,
-	chainCode int) {
-
-	switch chainCode {
-	case 0:
-		c.Address = delegator
-		origin := c.Rewards[validator]
-		if origin.UAtr > r.UAtr {
-			claim := origin.UAtr - r.UAtr
-			c.Claim.UAtr =
-				c.Claim.UAtr + claim
-
-		}
-		c.Rewards[validator] = r
-	case 1:
-		c.Address = delegator
-		origin := c.Rewards[validator]
-		if origin.UHar > r.UHar {
-			claim := origin.UHar - r.UHar
-			c.Claim.UHar =
-				c.Claim.UHar + claim
-		}
-		c.Rewards[validator] = r
-	case 2:
-		c.Address = delegator
-		origin := c.Rewards[validator]
-		if origin.UCor > r.UCor {
-			claim := origin.UCor - r.UCor
-			c.Claim.UCor =
-				c.Claim.UCor + claim
-		}
-
-		c.Rewards[validator] = r
-	case 3:
-		c.Address = delegator
-		origin := c.Rewards[validator]
-		if origin.UOrd > r.UOrd {
-			claim := origin.UOrd - r.UOrd
-			c.Claim.UOrd =
-				c.Claim.UOrd + claim
-		}
-		c.Rewards[validator] = r
-	}
-}
-
-func (c *Chain) UpdateUndelegate(chainCode, height int) {
-	deleteKey := []string{}
-	h := height
-	switch chainCode {
-	case 0:
-		for k, v := range c.Rewards {
-			if v.LastHeight < h {
-				c.Claim.UAtr =
-					c.Claim.UAtr + v.UAtr
-				c.Claim.SCOR =
-					c.Claim.SCOR + v.SCOR
-				c.Claim.SORD =
-					c.Claim.SORD + v.SORD
-				deleteKey = append(deleteKey, k)
-			}
-		}
-
-	case 1:
-		for k, v := range c.Rewards {
-			if v.LastHeight < h {
-				c.Claim.UHar =
-					c.Claim.UHar + v.UHar
-				c.Claim.SCOR =
-					c.Claim.SCOR + v.SCOR
-				c.Claim.SORD =
-					c.Claim.SORD + v.SORD
-				deleteKey = append(deleteKey, k)
-			}
-		}
-	case 2:
-		for k, v := range c.Rewards {
-			if v.LastHeight < h {
-				c.Claim.UCor =
-					c.Claim.UCor + v.UCor
-				c.Claim.SCOR =
-					c.Claim.SCOR + v.SCOR
-				c.Claim.SORD =
-					c.Claim.SORD + v.SORD
-				deleteKey = append(deleteKey, k)
-			}
-		}
-	case 3:
-		for k, v := range c.Rewards {
-			if v.LastHeight < h {
-				c.Claim.UOrd =
-					c.Claim.UOrd + v.UOrd
-				c.Claim.SCOR =
-					c.Claim.SCOR + v.SCOR
-				c.Claim.SORD =
-					c.Claim.SORD + v.SORD
-				deleteKey = append(deleteKey, k)
-			}
-		}
-	}
-	for _, key := range deleteKey {
-		delete(c.Rewards, key)
-	}
-}
-
 func (a *Account) CalculateTotal() {
 
 	ct := ChainTotal{
@@ -232,62 +183,65 @@ func (a *Account) CalculateTotal() {
 
 	for _, v := range a.Atreides.Rewards {
 		ct.UAtr += v.UAtr
+		ct.UAtr += v.Claim.UAtr
 		ct.SCOR += v.SCOR
+		ct.SCOR += v.Claim.SCOR
 		ct.SORD += v.SORD
+		ct.SORD += v.Claim.SORD
 		ct.SHAR += v.SHAR
+		ct.SHAR += v.Claim.SHAR
 		ct.SATR += v.SATR
+		ct.SATR += v.Claim.SATR
 	}
-	//claim reward +
-	ct.UAtr += a.Atreides.Claim.UAtr
-	ct.SCOR += a.Atreides.Claim.SCOR
-	ct.SORD += a.Atreides.Claim.SORD
-	ct.SHAR += a.Atreides.Claim.SHAR
-	ct.SATR += a.Atreides.Claim.SATR
+
 	a.Atreides.Total = ct
 
 	for _, v := range a.Harkonnen.Rewards {
 		ct.UHar += v.UHar
+		ct.UHar += v.Claim.UHar
 		ct.SCOR += v.SCOR
+		ct.SCOR += v.Claim.SCOR
 		ct.SORD += v.SORD
+		ct.SORD += v.Claim.SORD
 		ct.SHAR += v.SHAR
+		ct.SHAR += v.Claim.SHAR
 		ct.SATR += v.SATR
+		ct.SATR += v.Claim.SATR
 	}
 	//claim reward +
-	ct.UHar += a.Harkonnen.Claim.UHar
-	ct.SCOR += a.Harkonnen.Claim.SCOR
-	ct.SORD += a.Harkonnen.Claim.SORD
-	ct.SHAR += a.Harkonnen.Claim.SHAR
-	ct.SATR += a.Harkonnen.Claim.SATR
+
 	a.Harkonnen.Total = ct
 	// a.Total = a.Total+ a.Harkonnen.Total.NativeTotal)+ a.Harkonnen.Total.SCOR)+ a.Harkonnen.Total.SORD)
 	for _, v := range a.Corrino.Rewards {
 		ct.UCor += v.UCor
+		ct.UCor += v.Claim.UCor
 		ct.SCOR += v.SCOR
+		ct.SCOR += v.Claim.SCOR
 		ct.SORD += v.SORD
+		ct.SORD += v.Claim.SORD
 		ct.SHAR += v.SHAR
+		ct.SHAR += v.Claim.SHAR
 		ct.SATR += v.SATR
+		ct.SATR += v.Claim.SATR
 	}
 	//claim reward +
-	ct.UCor += a.Corrino.Claim.UCor
-	ct.SCOR += a.Corrino.Claim.SCOR
-	ct.SORD += a.Corrino.Claim.SORD
-	ct.SHAR += a.Corrino.Claim.SHAR
-	ct.SATR += a.Corrino.Claim.SATR
+
 	a.Corrino.Total = ct
 
 	for _, v := range a.Ordos.Rewards {
 		ct.UOrd += v.UOrd
+		ct.UOrd += v.Claim.UOrd
 		ct.SCOR += v.SCOR
+		ct.SCOR += v.Claim.SCOR
 		ct.SORD += v.SORD
+		ct.SORD += v.Claim.SORD
 		ct.SHAR += v.SHAR
+		ct.SHAR += v.Claim.SHAR
 		ct.SATR += v.SATR
+		ct.SATR += v.Claim.SATR
 	}
 	//claim reward +
-	ct.UOrd += a.Ordos.Claim.UOrd
-	ct.SCOR += a.Ordos.Claim.SCOR
-	ct.SORD += a.Ordos.Claim.SORD
-	ct.SHAR += a.Ordos.Claim.SHAR
-	ct.SATR += a.Ordos.Claim.SATR
+
 	a.Ordos.Total = ct
 
 	// a.Total = a.Total+ a.Ordos.Total.NativeTotal)+ a.Ordos.Total.SCOR)+ a.Ordos.Total.SORD)
