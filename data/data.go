@@ -94,7 +94,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			height = lastblock
 		}
 		res := GetDelegation(height, chainCode).Deligations
-		fmt.Printf("chain: %v height:%v lastblock:%v delecount \n ", chainCode, height, lastblock)
+		fmt.Printf("chain: %v height:%v lastblock:%v delecount:%v \n ", chainCode, height, lastblock, len(res))
 		for i := 0; i < len(res); i++ {
 			d := res[i].Delegation
 			g.Go(func() error {
