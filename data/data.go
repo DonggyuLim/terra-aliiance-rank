@@ -38,12 +38,12 @@ const (
 func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
 	w := &sync.WaitGroup{}
-	w.Add(5)
+	w.Add(1)
 	go MakeReward(w, ATREIDES)
-	go MakeReward(w, Harkonnen)
-	go MakeReward(w, CORRINO)
-	go MakeReward(w, ORDOS)
-	go MakeTotal(w)
+	// go MakeReward(w, Harkonnen)
+	// go MakeReward(w, CORRINO)
+	// go MakeReward(w, ORDOS)
+	// go MakeTotal(w)
 	wg.Wait()
 }
 
@@ -85,7 +85,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	case 0:
 		height = 54247
 	case 1:
-		height = 66557
+		height = 67227
 	case 2:
 		height = 253258
 	case 3:
