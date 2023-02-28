@@ -48,14 +48,13 @@ func GetDelegations2(height, chainCode int) (request.DelegationRequest, error) {
 
 	client := req.R().
 		SetHeader("x-cosmos-block-height", value).SetHeader("Content-Type", "application/json")
-	endpoint := fmt.Sprintf("%s/terra/alliances/delegations",
+	endpoint := fmt.Sprintf("%s/terra/alliances/delegations?pagination.limit=100000",
 		GetEndopoint(chainCode),
-		// GetAddress(chainCode, address),
 	)
-
+	fmt.Println(endpoint)
 	var req request.DelegationRequest
-	_, err := client.SetSuccessResult(&req).SetQueryParam("pagination.limit", "1000000").Get(endpoint)
-	fmt.Println(req)
+	_, err := client.SetSuccessResult(&req).Get(endpoint)
+
 	return req, err
 }
 func GetRewards2(chainCode, height int, delegator, validator, denom string) ([]request.Reward, error) {
@@ -69,6 +68,7 @@ func GetRewards2(chainCode, height int, delegator, validator, denom string) ([]r
 		validator,
 		denom,
 	)
+
 	//{delegator_addr}/{validator_addr}/{denom}
 	// endpoint := fmt.Sprintf("%s/terra/alliances/rewards/%s/{validator_addr}/{denom}", chain, el.deligator, validator, denom)
 	_, err := client.SetSuccessResult(&req).Get(endpoint)

@@ -39,10 +39,10 @@ func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
 	w := &sync.WaitGroup{}
 	w.Add(5)
-	go MakeReward(w, ATREIDES)
+	// go MakeReward(w, ATREIDES)
 	go MakeReward(w, Harkonnen)
-	go MakeReward(w, CORRINO)
-	go MakeReward(w, ORDOS)
+	// go MakeReward(w, CORRINO)
+	// go MakeReward(w, ORDOS)
 	go MakeTotal(w)
 	wg.Wait()
 }
@@ -94,15 +94,9 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 	c := client.QueryClient(chainCode)
 
-	// lastBlock := GetLastBlock(chainCode)
-	// if height > lastBlock {
-	// 	fmt.Printf("height : %v lastblock:%v time lock\n", height, lastBlock)
-	// 	time.Sleep(time.Minute * 5)
-	// 	continue
-	// }
 	for height < 300000 {
 		// delegationsData, err := GetDelegations(height, chainCode)
-		delegationData, err := GetDelegations2(chainCode, height)
+		delegationData, err := GetDelegations2(height, chainCode)
 
 		delegations := delegationData.Deligations
 		// fmt.Println(delegations)
