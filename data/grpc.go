@@ -14,7 +14,7 @@ import (
 )
 
 func GetDelegations(c module.QueryClient) []module.DelegationResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	req := &module.QueryAllAlliancesDelegationsRequest{}
 	// md := metadata.New(map[string]string{"x-cosmos-block-height": fmt.Sprintf("%v", height)})
@@ -26,7 +26,7 @@ func GetDelegations(c module.QueryClient) []module.DelegationResponse {
 }
 
 func GetDelegationsHeight(c module.QueryClient, height int) []module.DelegationResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	req := &module.QueryAllAlliancesDelegationsRequest{}
 	md := metadata.New(map[string]string{"x-cosmos-block-height": fmt.Sprintf("%v", height)})
@@ -38,7 +38,7 @@ func GetDelegationsHeight(c module.QueryClient, height int) []module.DelegationR
 }
 
 func GetDelegationsByDelegatorHeight(c module.QueryClient, delegator string, height int) []module.DelegationResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	req := &module.QueryAlliancesDelegationsRequest{
 		DelegatorAddr: delegator,
@@ -52,7 +52,7 @@ func GetDelegationsByDelegatorHeight(c module.QueryClient, delegator string, hei
 }
 
 func GetDelegationsByValidatorHeight(c module.QueryClient, delegator, validator string, height int) []module.DelegationResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	req := &module.QueryAlliancesDelegationByValidatorRequest{
 		DelegatorAddr: delegator,
@@ -67,7 +67,7 @@ func GetDelegationsByValidatorHeight(c module.QueryClient, delegator, validator 
 }
 
 func GetDelegationsByDelegator(c module.QueryClient, delegator string) []module.DelegationResponse {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	req := &module.QueryAlliancesDelegationsRequest{
 		DelegatorAddr: delegator,
@@ -81,7 +81,7 @@ func GetDelegationsByDelegator(c module.QueryClient, delegator string) []module.
 }
 
 func GetRewards(c module.QueryClient, delegator, validator, denom string) (*module.QueryAllianceDelegationRewardsResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	req := &module.QueryAllianceDelegationRewardsRequest{
 		DelegatorAddr: delegator,
@@ -90,8 +90,8 @@ func GetRewards(c module.QueryClient, delegator, validator, denom string) (*modu
 	}
 	// md := metadata.New(map[string]string{"x-cosmos-block-height": fmt.Sprintf("%v", height)})
 	// ctx = metadata.NewOutgoingContext(ctx, md)
-	var header metadata.MD
-	res, err := c.AllianceDelegationRewards(ctx, req, grpc.Header(&header))
+
+	res, err := c.AllianceDelegationRewards(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func GetRewards(c module.QueryClient, delegator, validator, denom string) (*modu
 }
 
 func GetRewardHeight(c module.QueryClient, delegator, validator, denom string, height int) (*module.QueryAllianceDelegationRewardsResponse, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	req := &module.QueryAllianceDelegationRewardsRequest{
 		DelegatorAddr: delegator,
@@ -117,7 +117,7 @@ func GetRewardHeight(c module.QueryClient, delegator, validator, denom string, h
 }
 
 func GetValidators(c module.QueryClient) []string {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 	req := &module.QueryAllAllianceValidatorsRequest{}
 	res, err := c.AllAllianceValidators(ctx, req)

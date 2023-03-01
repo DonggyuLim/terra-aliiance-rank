@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"sync"
 	"time"
@@ -27,11 +28,11 @@ const (
 func Main(wg *sync.WaitGroup) {
 	defer wg.Done()
 	w := &sync.WaitGroup{}
-	w.Add(5)
-	go MakeReward(w, ATREIDES)
+	w.Add(1)
+	// go MakeReward(w, ATREIDES)
 	go MakeReward(w, Harkonnen)
-	go MakeReward(w, CORRINO)
-	go MakeReward(w, ORDOS)
+	// go MakeReward(w, CORRINO)
+	// go MakeReward(w, ORDOS)
 	go MakeTotal(w)
 	wg.Wait()
 }
@@ -85,29 +86,31 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	// }
 	// latestBlock := GetLastBlock(chainCode)
 	// fmt.Println(g)
-	g, _ := errgroup.WithContext(context.Background())
-	height := 10000
+
 	for {
-		lastblock := GetLastBlock(chainCode)
-		if height > lastblock {
-			time.Sleep(time.Second * 300)
-			height = lastblock
-		}
+		start := time.Now()
+		height := GetLastBlock(chainCode)
 		res := GetDelegation(height, chainCode).Deligations
-		fmt.Printf("chain: %v height:%v lastblock:%v delecount:%v \n ", chainCode, height, lastblock, len(res))
+		fmt.Printf("chain: %v height:%v delecount:%v \n ", chainCode, height, len(res))
+
+		g, _ := errgroup.WithContext(context.Background())
 		for i := 0; i < len(res); i++ {
 			d := res[i].Delegation
 			g.Go(func() error {
+
 				rw := account.Reward{}
 				claim := account.Claim{}
 				reward, err := GetRewards(c, d.DelegatorAddress, d.ValidatorAddress, d.Denom)
-				if err != nil {
-					return err
+				if err != nil || len(reward.Rewards) == 0 {
+					return nil
 				}
+
 				rw.Add(reward.Rewards)
 				lastClaimHeight, _ := strconv.Atoi(d.LastRewardClaimHeight)
-
-				claim.Add(GetClaim(c, d.DelegatorAddress, d.ValidatorAddress, lastClaimHeight))
+				// utils.PrettyJson(reward.Rewards)
+				c := GetClaim(c, d.DelegatorAddress, d.ValidatorAddress, lastClaimHeight)
+				// fmt.Println("Claim Count", len(c))
+				claim.Add(c)
 				rw.Claim = claim
 				filter := bson.D{
 					{Key: "address", Value: utils.MakeKey(d.DelegatorAddress)},
@@ -115,7 +118,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				a, ok := db.FindOne(filter)
 				switch ok {
 				case mongo.ErrNoDocuments:
-					fmt.Println("New Account!")
+					// fmt.Println("New Account!")
 					key := utils.MakeKey(d.DelegatorAddress)
 					a.SetAccount(key, d.ValidatorAddress, rw, chainCode)
 					db.Insert(a)
@@ -137,7 +140,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 1:
-						// fmt.Println("harkonnen Update!")
+						// fmt.Println("harkonnen Update!", height)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -183,7 +186,12 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				}
 				return nil
 			})
+			if err := g.Wait(); err != nil {
+				log.Fatal(err)
+			}
 		}
-		height += 10
+
+		height += 1000
+		fmt.Println(height, time.Since(start))
 	}
 }

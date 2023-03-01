@@ -73,35 +73,35 @@ func GetLastBlock(chainCode int) int {
 }
 
 func GetClaim(c module.QueryClient, address, validator string, height int) []types.Coin {
-	//현재 돌고 있는건 claim 한 것임.
+
 	var coinSlice []types.Coin
 	lastHeight := height
-	// fmt.Println(lastHeight)
+	claimCount := 0
 
 	for {
 
-		res := GetDelegationsByValidatorHeight(c, address, validator, lastHeight)
+		res := GetDelegationsByValidatorHeight(c, address, validator, lastHeight-1)
 		// utils.PrettyJson(res)
-
-		re := res[0]
-
-		coins, err := GetRewardHeight(c, address, validator, re.Balance.Denom, height-1)
-		if err != nil {
+		if len(res) == 0 {
 			break
 		}
+		re := res[0]
 
+		coins, err := GetRewardHeight(c, address, validator, re.Balance.Denom, lastHeight-1)
+		claimCount += 1
+		lastHeight = int(re.Delegation.LastRewardClaimHeight)
+		// fmt.Println(lastHeight, coins, address, validator)
 		if err != nil || len(coins.Rewards) == 0 {
 			break
 		}
 
 		coinSlice = append(coinSlice, coins.Rewards...)
 
-		if re.Delegation.LastRewardClaimHeight == uint64(lastHeight) {
-			break
-		}
-		lastHeight = int(re.Delegation.LastRewardClaimHeight)
-
 	}
+	// if claimCount < 10 {
+	// 	fmt.Printf("Delegator :%s ,Validator : %s ,Height: %v, ClaimCount : %v\n", address, validator, height, claimCount)
+	// 	utils.PrettyJson(coinSlice)
+	// }
 
 	return coinSlice
 }

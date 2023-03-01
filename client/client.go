@@ -1,14 +1,9 @@
 package client
 
 import (
-	"fmt"
-	"sync"
-
 	alliancemoduletypes "github.com/terra-money/alliance/x/alliance/types"
 	"google.golang.org/grpc"
 )
-
-var once sync.Once
 
 func QueryClient(chainCode int) alliancemoduletypes.QueryClient {
 	var endpoint string
@@ -27,6 +22,6 @@ func QueryClient(chainCode int) alliancemoduletypes.QueryClient {
 		grpc.WithBlock(),
 	)
 	client := alliancemoduletypes.NewQueryClient(conn)
-	fmt.Println(client)
+
 	return client
 }
