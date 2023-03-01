@@ -111,11 +111,11 @@ func GetHeight(chainCode int) int {
 	case 0:
 		return 100880
 	case 1:
-		return 135010
+		return 138510
 	case 2:
-		return 328844
+		return 100000
 	case 3:
-		return 123246
+		return 133281
 	}
 	return 0
 }

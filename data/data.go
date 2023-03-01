@@ -74,7 +74,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	height := GetHeight(chainCode)
 	for {
 		start := time.Now()
-
+		fmt.Printf("chain : %v height:%v  time:%v Start!!", chainCode, height, start)
 		lastheight := GetLastBlock(chainCode)
 		if height > lastheight {
 			height = lastheight
@@ -118,8 +118,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				case nil:
 					switch chainCode {
 					case 0:
-						fmt.Printf("atreides Update!\n address : %s\n validator : %s \n height:%v \n denom:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
-						utils.PrettyJson(rw)
+						// fmt.Printf("atreides Update!\n address : %s\n validator : %s \n height:%v \n denom:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -135,7 +135,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						db.UpdateOne(filter, update)
 					case 1:
 						fmt.Printf("harkonnen Update!\n address : %s\n validator : %s \n height:%v \n  denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
-						utils.PrettyJson(rw)
+						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -150,7 +150,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 2:
-						fmt.Printf("corrino Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						// fmt.Printf("corrino Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
 						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
@@ -191,6 +191,6 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		}
 		height += 100
 		end := time.Since(start)
-		fmt.Printf("chain : %v height:%v  time:%v ", chainCode, height, end)
+		fmt.Printf("chain : %v height:%v  time:%v End!", chainCode, height, end)
 	}
 }
