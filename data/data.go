@@ -92,7 +92,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 				rw := account.Reward{}
 				claim := account.Claim{}
-				reward, err := GetRewards(c, d.DelegatorAddress, d.ValidatorAddress, d.Denom)
+				reward, err := GetRewardHeight(c, d.DelegatorAddress, d.ValidatorAddress, d.Denom, height)
 				if err != nil || len(reward.Rewards) == 0 {
 					return nil
 				}
@@ -118,7 +118,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				case nil:
 					switch chainCode {
 					case 0:
-						fmt.Println("atreides Update!", d.DelegatorAddress)
+						fmt.Printf("atreides Update!\n address : %s\n validator : %s \n height:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height)
 						utils.PrettyJson(rw)
 						update := bson.D{
 							{
@@ -134,7 +134,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 1:
-						fmt.Println("harkonnen Update!", d.DelegatorAddress)
+						fmt.Printf("harkonnen Update!\n address : %s\n validator : %s \n height:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height)
 						utils.PrettyJson(rw)
 						update := bson.D{
 							{
@@ -150,7 +150,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 2:
-						fmt.Println("corrino Update!", d.DelegatorAddress)
+						fmt.Printf("corrino Update!\n address : %s\n validator : %s \n height:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height)
 						utils.PrettyJson(rw)
 						update := bson.D{
 							{
@@ -166,7 +166,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 3:
-						fmt.Println("ordos Update!", d.DelegatorAddress)
+						fmt.Printf("ordos Update!\n address : %s\n validator : %s \n height:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height)
 						utils.PrettyJson(rw)
 						update := bson.D{
 							{
