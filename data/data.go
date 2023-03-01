@@ -80,7 +80,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			height = lastheight
 		}
 		res := GetDelegation(height, chainCode).Deligations
-		fmt.Printf("chain: %v height:%v delecount:%v \n ", chainCode, height, len(res))
+
 		if len(res) == 0 {
 			height += 100
 			continue
@@ -118,8 +118,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				case nil:
 					switch chainCode {
 					case 0:
-						// fmt.Printf("atreides Update!\n address : %s\n validator : %s \n height:%v \n denom:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
-						// utils.PrettyJson(rw)
+						fmt.Printf("atreides Update!\n address : %s\n validator : %s \n height:%v \n denom:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -134,8 +134,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 1:
-						// fmt.Printf("harkonnen Update!\n address : %s\n validator : %s \n height:%v \n  denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
-						// utils.PrettyJson(rw)
+						fmt.Printf("harkonnen Update!\n address : %s\n validator : %s \n height:%v \n  denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -150,7 +150,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 2:
-						// fmt.Printf("corrino Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						fmt.Printf("corrino Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
 						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
@@ -166,7 +166,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 3:
-						// fmt.Printf("ordos Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						fmt.Printf("ordos Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
 						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
