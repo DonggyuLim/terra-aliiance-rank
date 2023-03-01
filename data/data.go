@@ -192,7 +192,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 		end := time.Since(start)
 		if end > (time.Second * 60) {
-			height += 500
+			height += 200
 		} else {
 			height += 100
 		}
