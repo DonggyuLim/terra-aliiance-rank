@@ -71,13 +71,20 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	defer wg.Done()
 
 	c := client.QueryClient(chainCode)
-
+	height := 10000
 	for {
 		start := time.Now()
-		height := GetLastBlock(chainCode)
+
+		lastheight := GetLastBlock(chainCode)
+		if height > lastheight {
+			height = lastheight
+		}
 		res := GetDelegation(height, chainCode).Deligations
 		fmt.Printf("chain: %v height:%v delecount:%v \n ", chainCode, height, len(res))
-
+		if len(res) == 0 {
+			height += 100
+			continue
+		}
 		g, _ := errgroup.WithContext(context.Background())
 		for i := 0; i < len(res); i++ {
 			d := res[i].Delegation
@@ -95,6 +102,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				// utils.PrettyJson(reward.Rewards)
 				c := GetClaim(c, d.DelegatorAddress, d.ValidatorAddress, lastClaimHeight)
 				// fmt.Println("Claim Count", len(c))
+
 				claim.Add(c)
 				rw.Claim = claim
 				filter := bson.D{
@@ -174,6 +182,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			if err := g.Wait(); err != nil {
 				log.Fatal(err)
 			}
+			height += 100
 		}
 
 		fmt.Println(height, time.Since(start))
