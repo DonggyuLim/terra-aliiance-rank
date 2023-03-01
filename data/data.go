@@ -111,14 +111,15 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				a, ok := db.FindOne(filter)
 				switch ok {
 				case mongo.ErrNoDocuments:
-					// fmt.Println("New Account!")
+					fmt.Println("New Account!", d.DelegatorAddress)
 					key := utils.MakeKey(d.DelegatorAddress)
 					a.SetAccount(key, d.ValidatorAddress, rw, chainCode)
 					db.Insert(a)
 				case nil:
 					switch chainCode {
 					case 0:
-						// fmt.Println("atreides Update!")
+						fmt.Println("atreides Update!", d.DelegatorAddress)
+						utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -133,7 +134,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 1:
-						// fmt.Println("harkonnen Update!", height)
+						fmt.Println("harkonnen Update!", d.DelegatorAddress)
+						utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -148,6 +150,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 2:
+						fmt.Println("corrino Update!", d.DelegatorAddress)
+						utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -162,6 +166,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 3:
+						fmt.Println("ordos Update!", d.DelegatorAddress)
+						utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
