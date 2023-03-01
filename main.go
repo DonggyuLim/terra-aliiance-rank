@@ -10,7 +10,7 @@ import (
 
 func main() {
 	wg := &sync.WaitGroup{}
-	wg.Add(1)
+	wg.Add(2)
 	db.Connect()
 	defer db.Close()
 
