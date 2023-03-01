@@ -134,7 +134,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 1:
-						fmt.Printf("harkonnen Update!\n address : %s\n validator : %s \n height:%v \n  denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						// fmt.Printf("harkonnen Update!\n address : %s\n validator : %s \n height:%v \n  denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
 						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
@@ -166,7 +166,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 3:
-						fmt.Printf("ordos Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						// fmt.Printf("ordos Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
 						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
