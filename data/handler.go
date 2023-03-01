@@ -105,3 +105,17 @@ func GetClaim(c module.QueryClient, address, validator string, height int) []typ
 
 	return coinSlice
 }
+
+func GetHeight(chainCode int) int {
+	switch chainCode {
+	case 0:
+		return 100000
+	case 1:
+		return 100000
+	case 2:
+		return 100000
+	case 3:
+		return 100000
+	}
+	return 0
+}

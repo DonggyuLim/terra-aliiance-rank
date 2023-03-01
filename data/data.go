@@ -71,7 +71,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	defer wg.Done()
 
 	c := client.QueryClient(chainCode)
-	height := 10000
+	height := GetHeight(chainCode)
 	for {
 		start := time.Now()
 
@@ -111,15 +111,15 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				a, ok := db.FindOne(filter)
 				switch ok {
 				case mongo.ErrNoDocuments:
-					fmt.Println("New Account!", d.DelegatorAddress)
+					// fmt.Println("New Account!", d.DelegatorAddress)
 					key := utils.MakeKey(d.DelegatorAddress)
 					a.SetAccount(key, d.ValidatorAddress, rw, chainCode)
 					db.Insert(a)
 				case nil:
 					switch chainCode {
 					case 0:
-						fmt.Printf("atreides Update!\n address : %s\n validator : %s \n height:%v \n denom:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
-						utils.PrettyJson(rw)
+						// fmt.Printf("atreides Update!\n address : %s\n validator : %s \n height:%v \n denom:%v \n  ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -134,8 +134,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 1:
-						fmt.Printf("harkonnen Update!\n address : %s\n validator : %s \n height:%v \n  denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
-						utils.PrettyJson(rw)
+						// fmt.Printf("harkonnen Update!\n address : %s\n validator : %s \n height:%v \n  denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -150,8 +150,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 2:
-						fmt.Printf("corrino Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
-						utils.PrettyJson(rw)
+						// fmt.Printf("corrino Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -166,8 +166,8 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 						}
 						db.UpdateOne(filter, update)
 					case 3:
-						fmt.Printf("ordos Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
-						utils.PrettyJson(rw)
+						// fmt.Printf("ordos Update!\n address : %s\n validator : %s \n height:%v \n   denom:%v \n ", d.DelegatorAddress, d.ValidatorAddress, height, d.Denom)
+						// utils.PrettyJson(rw)
 						update := bson.D{
 							{
 								Key: "$set", Value: bson.D{
@@ -189,8 +189,9 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 				log.Fatal(err)
 			}
 			height += 10
-		}
 
-		fmt.Println(height, time.Since(start))
+		}
+		end := time.Since(start)
+		fmt.Printf("chain : %v height:%v  time:%v ", chainCode, height, end)
 	}
 }
