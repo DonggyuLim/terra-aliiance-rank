@@ -72,21 +72,6 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 
 	c := client.QueryClient(chainCode)
 
-	// accounts := GetAccounts(chainCode)
-	// validator := GetValidators(c)
-
-	// for _, account := range accounts {
-	// 	for _, validator := range validator {
-	// 		res := GetDelegationsByValidator(c, account, validator)
-	// 		if len(res) == 0 {
-	// 			continue
-	// 		}
-	// 		utils.PrettyJson(res)
-	// 	}
-	// }
-	// latestBlock := GetLastBlock(chainCode)
-	// fmt.Println(g)
-
 	for {
 		start := time.Now()
 		height := GetLastBlock(chainCode)
