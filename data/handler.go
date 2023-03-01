@@ -109,13 +109,13 @@ func GetClaim(c module.QueryClient, address, validator string, height int) []typ
 func GetHeight(chainCode int) int {
 	switch chainCode {
 	case 0:
-		return 100000
+		return 100880
 	case 1:
-		return 100000
+		return 135010
 	case 2:
-		return 100000
+		return 328844
 	case 3:
-		return 100000
+		return 123246
 	}
 	return 0
 }
