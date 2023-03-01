@@ -33,6 +33,8 @@ func Start(wg *sync.WaitGroup) {
 	r.GET("/uord", UOrdRank)
 	r.GET("/scor", SCorRank)
 	r.GET("/sord", SOrdRank)
+	r.GET("/shar", SHarRank)
+	r.GET("/satr", SAtrRank)
 	r.GET("/account/:address", UserReward)
 	r.Run(port)
 	defer wg.Done()

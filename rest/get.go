@@ -128,7 +128,7 @@ type UOrdResponse struct {
 }
 
 func UOrdRank(c *gin.Context) {
-	list, err := db.Find("", "", "total.ord", 100)
+	list, err := db.Find("", "", "total.uord", 100)
 	var res []UOrdResponse
 	for _, el := range list {
 		uord := UOrdResponse{
@@ -191,7 +191,53 @@ func SOrdRank(c *gin.Context) {
 	c.JSON(200, res)
 }
 
-type MyRewardResponse struct {
+type SAtrResponse struct {
+	Address string `json:"address"`
+	SATR    string `json:"amount"`
+}
+
+func SAtrRank(c *gin.Context) {
+	list, err := db.Find("", "", "total.satr", 100)
+	var res []SAtrResponse
+	for _, el := range list {
+		satr := SAtrResponse{
+			Address: el.Address,
+			SATR:    fmt.Sprintf("%v", el.Total.SATR),
+		}
+		res = append(res, satr)
+	}
+	if err != nil {
+		fmt.Println(err)
+		c.String(404, err.Error())
+		return
+	}
+	c.JSON(200, res)
+}
+
+type SHARResponse struct {
+	Address string `json:"address"`
+	SHAR    string `json:"amount"`
+}
+
+func SHarRank(c *gin.Context) {
+	list, err := db.Find("", "", "total.shar", 100)
+	var res []SHARResponse
+	for _, el := range list {
+		uord := SHARResponse{
+			Address: el.Address,
+			SHAR:    fmt.Sprintf("%v", el.Total.SHAR),
+		}
+		res = append(res, uord)
+	}
+	if err != nil {
+		fmt.Println(err)
+		c.String(404, err.Error())
+		return
+	}
+	c.JSON(200, res)
+}
+
+type AccountdResponse struct {
 	Address string `json:"address"`
 	UAtr    string `json:"uatr"`
 	UHar    string `json:"uhar"`
@@ -214,7 +260,7 @@ func UserReward(c *gin.Context) {
 	a, ok := db.FindOne(filter)
 	switch ok {
 	case nil:
-		myReward := MyRewardResponse{
+		myReward := AccountdResponse{
 			Address: a.Address,
 			UAtr:    fmt.Sprintf("%v", a.Total.UAtr),
 			UHar:    fmt.Sprintf("%v", a.Total.UHar),
