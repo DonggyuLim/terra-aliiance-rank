@@ -81,6 +81,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		res := GetDelegation(height, chainCode).Deligations
 
 		if len(res) == 0 {
+			fmt.Printf("chain : %v height : %v  time : %v Not Dele!!\n", chainCode, height, start)
 			height += 100
 			continue
 		}
