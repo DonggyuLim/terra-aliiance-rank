@@ -74,7 +74,6 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 	height := GetHeight(chainCode)
 	for {
 		start := time.Now()
-		fmt.Printf("chain : %v height : %v  time : %v Start!!\n", chainCode, height, start)
 		lastheight := GetLastBlock(chainCode)
 		if height > lastheight {
 			height = lastheight
@@ -85,6 +84,7 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 			height += 100
 			continue
 		}
+		fmt.Printf("chain : %v height : %v  time : %v Start!!\n", chainCode, height, start)
 		g, _ := errgroup.WithContext(context.Background())
 		for i := 0; i < len(res); i++ {
 			d := res[i].Delegation
@@ -194,9 +194,9 @@ func MakeReward(wg *sync.WaitGroup, chainCode int) {
 		if end > (time.Second * 90) {
 			height += 1000
 		} else if end > (time.Second * 60) {
-			height += 500
+			height += 750
 		} else if end > (time.Second * 30) {
-			height += 250
+			height += 500
 		} else {
 			height += 50
 		}
